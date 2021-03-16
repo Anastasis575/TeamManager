@@ -6,6 +6,7 @@ import tkinter.messagebox as mb
 import ClubPage as pg
 data = None
 debug=True
+
 def run(first=False):
     #innitializes the info dataframe
     data=None

@@ -89,6 +89,20 @@ class Club(tk.Frame):
         self.view["menu"].config(font=("Arial",18))
         self.view.place(relwidth=0.3,relx=0.35,relheight=0.1,rely=0.75)
 
+        options1=["Από"]
+        self.rangeA=tk.StringVar()
+        self.rangeA.set(options1[0])
+        self.begin_time=tk.OptionMenu(self.headerFrame,self.rangeA,*options1,command=lambda value: self.rangeA.set(value))
+        self.begin_time.config(font=("Arial",18))
+        self.begin_time["menu"].config(font=("Arial",18))
+        self.begin_time.place(relwidth=0.125,relx=0.5,relheight=0.1,rely=0.6)
+        options2=["Μέχρι"]
+        self.rangeB=tk.StringVar()
+        self.rangeB.set(options2[0])
+        self.end_time=tk.OptionMenu(self.headerFrame,self.rangeB,*options2,command=lambda value: self.rangeB.set(value))
+        self.end_time.config(font=("Arial",18))
+        self.end_time["menu"].config(font=("Arial",18))
+        self.end_time.place(relwidth=0.125,relx=0.35,relheight=0.1,rely=0.6)
         #Main Content frame
         self.contentFrame=tk.Frame(self.subHeaderFrame,bg="#474a48")
         self.contentFrame.place(relheight=1,relwidth=0.7,relx=0.3)
@@ -157,8 +171,10 @@ class Club(tk.Frame):
         self.changes.clear()
         self.window.deiconify()
         self.root.destroy()
-
-
+    def setStart(self):
+        pass
+    def setEnd(self):
+        pass
     def initAthlete(self):
         if self.changes.peekType()=="Athletes":
             self.changes.moveBack(self.root,"Club")
@@ -175,6 +191,25 @@ class Club(tk.Frame):
         self.Edit["state"]=tk.DISABLED
         self.Salary["state"]=tk.DISABLED
         if self.Variable.get()=="Οικονομικές Κινήσεις":
+            self.begin_time["state"]=tk.NORMAL
+            self.end_time["state"]=tk.NORMAL
+            self.rangeA.set("")
+            self.begin_time["menu"].delete(0,'end')
+            max=pd.to_datetime("1/1/2020")
+            for column in self.notes["Ημερομηνία"].unique():
+                temp=pd.to_datetime(column)
+                max=max if temp<=max else temp
+                self.begin_time["menu"].add_command(label=temp.to_period("D"),command=lambda value=temp.to_period("D"): self.set_date(value,"A"))
+            self.rangeA.set(max.to_period("D"))
+            self.rangeB.set("")
+            self.end_time["menu"].delete(0,'end')
+            max=pd.to_datetime("1/1/2020")
+            for column in self.notes["Ημερομηνία"].unique():
+                temp=pd.to_datetime(column)
+                max=max if temp<=max else temp
+                self.end_time["menu"].add_command(label=temp.to_period("D"),command=lambda value=temp.to_period("D"): self.set_date(value,"B"))
+            self.rangeB.set(max.to_period("D"))
+            #self.update(0)
             self.notes=readCalendar()
             self.Create["state"]=tk.NORMAL
             self.Delete["state"]=tk.NORMAL
@@ -206,61 +241,82 @@ class Club(tk.Frame):
             self.movements.heading("Τύπος",text="Τύπος",anchor=tk.W)
             self.movements.heading("Έσοδο",text="Έσοδο",anchor=tk.W)
             self.movements.heading("Έξοδο",text="Έξοδο",anchor=tk.W)
-            self.refreshMovements(0)
+            self.refreshMovements(0,self.rangeA.get(),self.rangeB.get())
 
             self.movements.pack(expand=True,fill=tk.BOTH)
             self.movementScroll.config(command=self.movements.yview)
         elif self.Variable.get()=="Ταμείο Συλλόγου":
+            self.rangeA.set("")
+            self.begin_time["menu"].delete(0,'end')
+            self.begin_time["menu"].add_command(label="Από",command=lambda value="Από": self.rangeA.set("Από"))
+            self.rangeA.set("Από")
+            self.begin_time["state"]=tk.DISABLED
+            self.rangeB.set("")
+            self.end_time["menu"].delete(0,'end')
+            self.end_time["menu"].add_command(label="Μέχρι",command=lambda value="Μέχρι": self.rangeB.set("Μέχρι"))
+            self.end_time["state"]=tk.DISABLED
+            self.rangeB.set("Μέχρι")
             if len(self.contentFrame.winfo_children())!=0:
                for i in self.contentFrame.winfo_children():
                    i.destroy()
             note=self.notes[self.notes["Ιδιωτικό"]==False]
-            contentCanvas=tk.Canvas(self.contentFrame,bg="#474a48")
-            contentCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
-            contentScroll=ttk.Scrollbar(self.contentFrame,command=contentCanvas.yview)
-            contentScroll.pack(side=tk.RIGHT,fill=tk.Y)
-            contentCanvas.configure(yscrollcommand=contentScroll.set)
-            contentCanvas.bind("<Configure>",lambda e: contentCanvas.configure(scrollregion=contentCanvas.bbox("all")))
-            actualFrame=tk.Frame(self.contentFrame,bg="#474a48")
-            contentCanvas.create_window((0,0),window=actualFrame,anchor=tk.NW,)
-            label=tk.Label(actualFrame,text="Αναλυση Ταμείου Συλλόγου",bg="#474a48",fg="#fff",font=("Arial Black",22),justify=tk.CENTER)
-            label.pack()
-            revenue={}
-            cost={}
-            for i in note["Τύπος"].unique():
-                temp=note[note["Τύπος"].str.match(i)]
-                if temp["Έσοδο"].sum()!=0:
-                    revenue[i]=temp["Έσοδο"].sum()
-                if temp["Έξοδο"].sum()!=0:
-                    cost[i]=temp["Έξοδο"].sum()
-            labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            labelFrame.pack(fill=tk.X)
-            label=tk.Label(labelFrame,text="\nΕξόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
-            label.pack(fill=tk.X,side=tk.LEFT)
-            for content in cost:
-                labelFrame=tk.Frame(actualFrame,bg="#474a48")
-                labelFrame.pack(fill=tk.X)
-                label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
-                label.pack(fill=tk.X,side=tk.LEFT)
-                label=tk.Label(labelFrame,text=str(cost[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
-                label.pack(fill=tk.X)
-            labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            labelFrame.pack(fill=tk.X)
-            label=tk.Label(labelFrame,text="\nΕσόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
-            label.pack(fill=tk.X,side=tk.LEFT)
-            for content in revenue:
-                labelFrame=tk.Frame(actualFrame,bg="#474a48")
-                labelFrame.pack(fill=tk.X)
-                label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
-                label.pack(fill=tk.X,side=tk.LEFT)
-                label=tk.Label(labelFrame,text=str(revenue[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
-                label.pack(fill=tk.X)
-            labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            labelFrame.pack(fill=tk.X)
-            label=tk.Label(labelFrame,text="\n\nΣυνολικό Ταμείο: "+str(self.notes.iloc[0]["Ποσό"])+"€",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.CENTER)
-            label.pack(fill=tk.X,side=tk.LEFT)
+            self.createReceipt(note,self.rangeA.get(),self.rangeB.get())
+            #contentCanvas=tk.Canvas(self.contentFrame,bg="#474a48")
+            #contentCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
+            #contentScroll=ttk.Scrollbar(self.contentFrame,command=contentCanvas.yview)
+            #contentScroll.pack(side=tk.RIGHT,fill=tk.Y)
+            #contentCanvas.configure(yscrollcommand=contentScroll.set)
+            #contentCanvas.bind("<Configure>",lambda e: contentCanvas.configure(scrollregion=contentCanvas.bbox("all")))
+            #actualFrame=tk.Frame(self.contentFrame,bg="#474a48")
+            #contentCanvas.create_window((0,0),window=actualFrame,anchor=tk.NW,)
+            #label=tk.Label(actualFrame,text="Αναλυση Ταμείου Συλλόγου",bg="#474a48",fg="#fff",font=("Arial Black",22),justify=tk.CENTER)
+            #label.pack()
+            #revenue={}
+            #cost={}
+            #for i in note["Τύπος"].unique():
+            #    temp=note[note["Τύπος"].str.match(i)]
+            #    if temp["Έσοδο"].sum()!=0:
+            #        revenue[i]=temp["Έσοδο"].sum()
+            #    if temp["Έξοδο"].sum()!=0:
+            #        cost[i]=temp["Έξοδο"].sum()
+            #labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            #labelFrame.pack(fill=tk.X)
+            #label=tk.Label(labelFrame,text="\nΕξόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
+            #label.pack(fill=tk.X,side=tk.LEFT)
+            #for content in cost:
+            #    labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            #    labelFrame.pack(fill=tk.X)
+            #    label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+            #    label.pack(fill=tk.X,side=tk.LEFT)
+            #    label=tk.Label(labelFrame,text=str(cost[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
+            #    label.pack(fill=tk.X)
+            #labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            #labelFrame.pack(fill=tk.X)
+            #label=tk.Label(labelFrame,text="\nΕσόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
+            #label.pack(fill=tk.X,side=tk.LEFT)
+            #for content in revenue:
+            #    labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            #    labelFrame.pack(fill=tk.X)
+            #    label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+            #    label.pack(fill=tk.X,side=tk.LEFT)
+            #    label=tk.Label(labelFrame,text=str(revenue[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
+            #    label.pack(fill=tk.X)
+            #labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            #labelFrame.pack(fill=tk.X)
+            #label=tk.Label(labelFrame,text="\n\nΣυνολικό Ταμείο: "+str(self.notes.iloc[0]["Ποσό"])+"€",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.CENTER)
+            #label.pack(fill=tk.X,side=tk.LEFT)
         elif self.Variable.get()=="Μισθοδοσίες":
             self.coach=readCoaches()
+            self.rangeA.set("")
+            self.begin_time["menu"].delete(0,'end')
+            self.begin_time["menu"].add_command(label="Από",command=lambda value="Από": self.rangeA.set("Από"))
+            self.rangeA.set("Από")
+            self.begin_time["state"]=tk.DISABLED
+            self.rangeB.set("")
+            self.end_time["menu"].delete(0,'end')
+            self.end_time["menu"].add_command(label="Μέχρι",command=lambda value="Μέχρι": self.rangeB.set("Μέχρι"))
+            self.end_time["state"]=tk.DISABLED
+            self.rangeB.set("Μέχρι")
             self.Create["state"]=tk.NORMAL
             self.Delete["state"]=tk.NORMAL
             self.Edit["state"]=tk.NORMAL
@@ -305,17 +361,30 @@ class Club(tk.Frame):
 
 
 
-    def refreshMovements(self,value):
+    def refreshMovements(self,value,dateA=None,dateB=None):
+        """Recreates the Treeview with the desired information(Specifically Movements
+            @value: a non-avoidable 
+        """
         if len(self.movements.get_children())!=0:
             for item in self.movements.get_children():
                 self.movements.delete(item)
         count=0
-        if len(self.notes)!=0:
-            move=self.notes[self.notes["Ιδιωτικό"]==False].sort_values("Ημερομηνία")
-            for group,frame in move.groupby(level=0):
-                if len(pd.date_range(start=pd.to_datetime(frame["Ημερομηνία"].iloc[0]),end=pd.Timestamp.now(),freq="MS"))==0:
-                    self.movements.insert(parent="",index=tk.END,iid=count,values=(str(frame["Ημερομηνία"].iloc[0]),frame["Όνομα"].iloc[0],frame["Τύπος"].iloc[0],frame["Έσοδο"].iloc[0],frame["Έξοδο"].iloc[0]))
-                    count+=1
+        if dateA==None and dateB==None:
+            if len(self.notes)!=0:
+                move=self.notes[self.notes["Ιδιωτικό"]==False].sort_values("Ημερομηνία")
+                for group,frame in move.groupby(level=0):
+                    if len(pd.date_range(start=pd.to_datetime(frame["Ημερομηνία"].iloc[0]),end=pd.Timestamp.now(),freq="MS"))==0:
+                        self.movements.insert(parent="",index=tk.END,iid=count,values=(str(frame["Ημερομηνία"].iloc[0]),frame["Όνομα"].iloc[0],frame["Τύπος"].iloc[0],frame["Έσοδο"].iloc[0],frame["Έξοδο"].iloc[0]))
+                        count+=1
+        else:
+             if len(self.notes)!=0:
+                move=self.notes[self.notes["Ιδιωτικό"]==False].sort_values("Ημερομηνία")
+                startT=pd.to_datetime(dateA)
+                endT=pd.to_datetime(dateB)
+                for group,frame in move.groupby(level=0):
+                    if startT<=pd.to_datetime(frame["Ημερομηνία"].iloc[0])<=endT:
+                        self.movements.insert(parent="",index=tk.END,iid=count,values=(str(frame["Ημερομηνία"].iloc[0]),frame["Όνομα"].iloc[0],frame["Τύπος"].iloc[0],frame["Έσοδο"].iloc[0],frame["Έξοδο"].iloc[0]))
+                        count+=1
 
 
     def refreshSalaries(self,value):
@@ -328,6 +397,55 @@ class Club(tk.Frame):
                 temp=list(frame.index[0])
                 self.salary.insert(parent="",index=tk.END,iid=count,values=(str(frame["Τελευταία Μισθοδοσία"].iloc[0]),temp[1],temp[0],frame["Σύνολο"].iloc[0]))
                 count+=1
+    
+    def createReceipt(self,note,start,end):
+        contentCanvas=tk.Canvas(self.contentFrame,bg="#474a48")
+        contentCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
+        contentScroll=ttk.Scrollbar(self.contentFrame,command=contentCanvas.yview)
+        contentScroll.pack(side=tk.RIGHT,fill=tk.Y)
+        contentCanvas.configure(yscrollcommand=contentScroll.set)
+        contentCanvas.bind("<Configure>",lambda e: contentCanvas.configure(scrollregion=contentCanvas.bbox("all")))
+        actualFrame=tk.Frame(self.contentFrame,bg="#474a48")
+        contentCanvas.create_window((0,0),window=actualFrame,anchor=tk.NW,)
+        label=tk.Label(actualFrame,text="Αναλυση Ταμείου Συλλόγου",bg="#474a48",fg="#fff",font=("Arial Black",22),justify=tk.CENTER)
+        label.pack()
+        revenue={}
+        cost={}
+        for i in note["Τύπος"].unique():
+            temp=note[note["Τύπος"].str.match(i)]
+            if temp["Έσοδο"].sum()!=0:
+                revenue[i]=temp["Έσοδο"].sum()
+            if temp["Έξοδο"].sum()!=0:
+                cost[i]=temp["Έξοδο"].sum()
+        labelFrame=tk.Frame(actualFrame,bg="#474a48")
+        labelFrame.pack(fill=tk.X)
+        label=tk.Label(labelFrame,text="\nΕξόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
+        label.pack(fill=tk.X,side=tk.LEFT)
+        for content in cost:
+            labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            labelFrame.pack(fill=tk.X)
+            label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+            label.pack(fill=tk.X,side=tk.LEFT)
+            label=tk.Label(labelFrame,text=str(cost[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
+            label.pack(fill=tk.X)
+        labelFrame=tk.Frame(actualFrame,bg="#474a48")
+        labelFrame.pack(fill=tk.X)
+        label=tk.Label(labelFrame,text="\nΕσόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
+        label.pack(fill=tk.X,side=tk.LEFT)
+        for content in revenue:
+            labelFrame=tk.Frame(actualFrame,bg="#474a48")
+            labelFrame.pack(fill=tk.X)
+            label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+            label.pack(fill=tk.X,side=tk.LEFT)
+            label=tk.Label(labelFrame,text=str(revenue[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
+            label.pack(fill=tk.X)
+        labelFrame=tk.Frame(actualFrame,bg="#474a48")
+        labelFrame.pack(fill=tk.X)
+        label=tk.Label(labelFrame,text="\n\nΣυνολικό Ταμείο: "+str(self.notes.iloc[0]["Ποσό"])+"€",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.CENTER)
+        label.pack(fill=tk.X,side=tk.LEFT)
+
+
+
 
     def correctDate(self):
         month=self.dates[self.search.current()].month
@@ -405,8 +523,22 @@ class Club(tk.Frame):
                 self.w_c["Edit"].iconify()
                 self.w_c["Edit"].deiconify()
 
-    def chooseMonth(self,value):
-        pass
+    def set_date(self,value,begin):
+        """Set date in the oprtion box and apply the changes to the Treeview
+        """
+        if begin=="A":
+            self.rangeA.set(value)
+            if self.Variable.get()=="Οικονομικές Κινήσεις":
+                self.rangeA.set(value)
+                self.refreshMovements(0,self.rangeA.get(),self.rangeB.get())
+            elif self.Variable.get()=="Οικονομικές Κινήσεις":
+                pass
+        else:
+            self.rangeB.set(value)
+            if self.Variable.get()=="Οικονομικές Κινήσεις":
+                self.refreshMovements(0,self.rangeA.get(),self.rangeB.get())
+            elif self.Variable.get()=="Οικονομικές Κινήσεις":
+                pass
 
 class createMovement(tk.Frame):
     def __init__(self,root,window,notes):
@@ -496,7 +628,7 @@ class createMovement(tk.Frame):
         self.root.protocol("WM_DELETE_WINDOW",func=self.exit)
         self.root.mainloop()
     def exit(self):
-        self.window.w_c["Create"]=""
+        self.window.w_c["EditSalary"]=""
         self.root.destroy()
     def modifyChoices(self,Income):
         if Income:
@@ -649,7 +781,7 @@ class EditMovement(tk.Frame):
         editButton=tk.Button(mainFrame,text="Επεξεργασία",command=self.enable,bg="#bec1c4",font=('Arial',18))
         editButton.place(relheight=0.075,relwidth=0.4,relx=0.05,rely=0.9)
 
-        self.root.protocol("WM_DESTROY_WINDOW",self.exit)
+        self.root.protocol("WM_DELETE_WINDOW",self.exit)
         self.root.mainloop()
     def complete(self):
         self.notes["Ποσό"].iloc[0]+=self.notes.loc[self.choice,"Έξοδο"]-self.notes.loc[self.choice,"Έσοδο"]
@@ -666,6 +798,7 @@ class EditMovement(tk.Frame):
                 self.notes.loc[self.choice,i]=self.entries[i].get("1.0","end-1c")
         self.notes["Ποσό"].iloc[0]+=self.notes.loc[self.choice,"Έσοδο"]-self.notes.loc[self.choice,"Έξοδο"]
         writeCalendar(self.notes)
+        self.exit()
         self.master.redraw()
     def modifyChoices(self,Income,preset=None):
         if Income:
@@ -674,7 +807,7 @@ class EditMovement(tk.Frame):
                 "Εγγραφή",
                 "Πώληση προωθητικού Υλικού",
                 "Χορηγίες",
-                "Διαφήμιση Εμφ10000000000000000000000000000000000000000ανίσεων",
+                "Διαφήμιση Εμφανίσεων",
                 "Διαφήμιση Χώρων",
                 "Εκδηλώσεις",
                 "Τουρνουά Βόλλευ",
@@ -796,7 +929,7 @@ class createCoach(tk.Frame):
         self.root.mainloop()
 
     def exit(self):
-        self.master.w_c["Create"]=""
+        self.master.w_c["Create"]=self.root
         self.root.destroy()
     def complete(self):
         data={"Τελευταία Μισθοδοσία":pd.to_datetime("1/1/2020",dayfirst=True).to_period("D"),"Σύνολο":0,"Ημερήσιες Αποδοχές":0,"Bonus":0,"Ημερομηνία Δημιουργίας":pd.Timestamp.now().to_period("D")}
@@ -955,6 +1088,13 @@ class viewDetails(tk.Frame):
         self.master=master
         self.coach=coach
         self.choice=choice
+        if len(self.coach.loc[self.choice])==1:
+            self.lastDate=self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"].iloc[0]
+            self.TrueCoach=self.coach.loc[self.choice]
+        else:
+            self.lastDate=self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"].max()
+            self.TrueCoach=self.coach.loc[self.choice].where(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"]==self.lastDate).dropna()
+        createCondition=len(pd.date_range(start=self.lastDate.to_timestamp(),end=pd.Timestamp.now(),freq="MS"))==0
         self.root=tk.Toplevel(self.master.root)
         self.master.w_c["EditSalary"]=self.root
         self.root.title("Στοιχεία Μισθοδοσίας")
@@ -972,12 +1112,20 @@ class viewDetails(tk.Frame):
         message=self.choice[0]+" "+self.choice[1]
         label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
         label.place(relheight=0.1,relwidth=0.4,relx=0.35,rely=0.15)
-        message="Ημερομηνία Τελευαταίας Μισθοδοσίας: "
+        message="Ημερομηνία Μισθοδοσίας: "
         label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
-        label.place(relheight=0.1,relwidth=0.6,relx=0.0,rely=0.225)
-        message=str(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"])
-        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))#Date of last paycheck
-        label.place(relheight=0.1,relwidth=0.2,relx=0.6,rely=0.225)
+        label.place(relheight=0.1,relwidth=0.5,relx=0.0,rely=0.225)
+        if len(self.coach.loc[self.choice])==1:
+            options=[self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"].iloc[0]]
+        else:
+            options=list(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"])
+        self.Past=tk.StringVar()#string variable to determine which month's
+        self.Past.set(options[-1])
+        #message=str(self.TrueCoach["Τελευταία Μισθοδοσία"].iloc[0])
+        Date=tk.OptionMenu(mainFrame,self.Past,*options,command=lambda value:self.PastSalary(value) if value!=self.lastDate else self.Past.set(self.lastDate))#Date of last paycheck
+        Date.config(bg="#fff",fg="#010101",font=("Arial",16))
+        Date["menu"].config(bg="#fff",fg="#010101",font=("Arial",16))
+        Date.place(relheight=0.05,relwidth=0.2,relx=0.45,rely=0.25)
 
         label=tk.Label(mainFrame,text="Αναλυτικά",bg="#1b2135",fg="#fff",font=("Arial",20))
         label.place(relheight=0.1,relwidth=0.4,relx=0.3,rely=0.3)
@@ -987,7 +1135,7 @@ class viewDetails(tk.Frame):
         label=tk.Label(labelFrame,text="Μέρος από Ημερήσιες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
         label.place(relheight=1,relwidth=0.6)
         self.dailyVar=tk.StringVar()
-        self.dailyVar.set(self.coach.loc[self.choice]["Ημερήσιες Αποδοχές"])
+        self.dailyVar.set(self.TrueCoach["Ημερήσιες Αποδοχές"].iloc[0] if createCondition else 0)
         self.dailyentry=tk.Entry(labelFrame,textvariable=self.dailyVar,bg="#fff",font=("Arial",18))
         self.dailyentry.place(relheight=1,relwidth=0.4,relx=0.6)
         self.dailyentry["state"]=tk.DISABLED
@@ -997,7 +1145,7 @@ class viewDetails(tk.Frame):
         label=tk.Label(labelFrame,text="Μέρος από Ωριαίες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
         label.place(relheight=1,relwidth=0.6)
         self.hourlyVar=tk.StringVar()
-        self.hourlyVar.set(self.coach.loc[self.choice]["Ωριαίες Αποδοχές"])
+        self.hourlyVar.set(self.TrueCoach["Ωριαίες Αποδοχές"].iloc[0] if createCondition else 0)
         self.hourlyentry=tk.Entry(labelFrame,textvariable=self.hourlyVar,bg="#fff",font=("Arial",18))
         self.hourlyentry.place(relheight=1,relwidth=0.4,relx=0.6)
         self.hourlyentry["state"]=tk.DISABLED
@@ -1007,7 +1155,7 @@ class viewDetails(tk.Frame):
         label=tk.Label(labelFrame,text="Μέρος από Bonus:",fg="#fff",bg="#1b2135",font=("Arial",18))
         label.place(relheight=1,relwidth=0.5)
         self.bonusVar=tk.StringVar()
-        self.bonusVar.set(self.coach.loc[self.choice]["Bonus"])
+        self.bonusVar.set(self.TrueCoach["Bonus"].iloc[0] if createCondition else 0)
         self.bonusentry=tk.Entry(labelFrame,textvariable=self.bonusVar,bg="#fff",font=("Arial",18))
         self.bonusentry.place(relheight=1,relwidth=0.5,relx=0.5)
         self.bonusentry["state"]=tk.DISABLED
@@ -1017,8 +1165,8 @@ class viewDetails(tk.Frame):
         labelFrame=tk.Frame(mainFrame,bg="#1b2135")
         labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.775)
         label=tk.Label(labelFrame,text="Σύνολο:",bg="#1b2135",fg="#fff",font=("Arial",18,"bold"))
-        label.place(relheight=1,relwidth=0.5)
-        self.final=tk.Label(labelFrame,text=str(int(self.hourlyVar.get())+int(self.bonusVar.get())+int(self.dailyVar.get())),fg="#fff",bg="#1b2135",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.3,relx=0.2)
+        self.final=tk.Label(labelFrame,text=str(int(float(self.hourlyVar.get()))+int(float(self.bonusVar.get()))+int(float(self.dailyVar.get()))),fg="#010101",bg="#fff",font=("Arial",18),anchor="w")
         self.final.place(relheight=1,relwidth=0.5,relx=0.5)
 
 
@@ -1028,26 +1176,97 @@ class viewDetails(tk.Frame):
         self.doneButton.place(relheight=0.075,relwidth=0.4,relx=0.55,rely=0.9)
         self.doneButton["state"]=tk.DISABLED
 
-        self.root.protocol("WM_WINDOW_DESTROY",self.exit)
+        self.root.protocol("WM_DELETE_WINDOW",self.exit)
         self.root.mainloop()
+
     def exit(self):
         self.master.w_c["EditSalary"]=""
         self.root.destroy()
+
     def enable(self):
         self.dailyentry["state"]=tk.NORMAL
         self.hourlyentry["state"]=tk.NORMAL
         self.bonusentry["state"]=tk.NORMAL
         self.doneButton["state"]=tk.NORMAL
+
     def complete(self):
         try:
-            self.coach.loc[self.choice,"Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
-            self.coach.loc[self.choice,"Ωριαίες Αποδοχές"]=int(self.hourlyVar.get())
-            self.coach.loc[self.choice,"Bonus"]=int(self.bonusVar.get())
-            self.coach.loc[self.choice,"Σύνολο"]=int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get())
-            self.bonusVar.set(int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get()))
-            if len(pd.date_range(start=self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"].to_timestamp(freq="D"),end=pd.Timestamp.now(),freq="MS"))>0:
+            if len(pd.date_range(start=self.TrueCoach["Τελευταία Μισθοδοσία"].to_timestamp(freq="D"),end=pd.Timestamp.now(),freq="MS"))==0:
+                self.coach.loc[self.choice,"Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
+                self.coach.loc[self.choice,"Ωριαίες Αποδοχές"]=int(self.hourlyVar.get())
+                self.coach.loc[self.choice,"Bonus"]=int(self.bonusVar.get())
+                self.coach.loc[self.choice,"Σύνολο"]=int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get())
+                self.bonusVar.set(int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get()))
                 self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"]=pd.Timestamp.now().to_period("D")
+            else:
+                temp=self.TrueCoach.copy()
+                temp["Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
+                temp["Ωριαίες Αποδοχές"]=int(self.hourlyVar.get())
+                temp["Bonus"]=int(self.bonusVar.get())
+                temp["Σύνολο"]=int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get())
+                self.bonusVar.set(int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get()))
+                temp["Τελευταία Μισθοδοσία"]=pd.Timestamp.now().to_period("D")
+                self.coach=self.coach.append(temp)
             writeCoaches(self.coach)
             self.master.redraw()
         except ValueError:
             mb.showinfo("Λάθος Είσοδος","Στα πεδία αποδοχών πρέπει να αναγραφεί το ποσό της αποδοχής, το οποίο είναι ένας ακέραιος αριθμός.")
+    def PastSalary(self,value):
+        self.Past.set(self.lastDate)
+        selected=self.coach.loc[self.choice].where(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"]==value).dropna()
+        miniroot=tk.Toplevel(self.root)
+        miniroot.title("Μισθοδωσία {}".format(value))
+        topCanvas=tk.Canvas(miniroot,height=800,width=700,bg="#1b2135")
+        topCanvas.pack()
+        mainFrame=tk.Frame(topCanvas,bg="#1b2135")
+        mainFrame.place(relheight=1,relwidth=1)
+        #Intro Information
+        message="Μισθοδοτικά στοιχεία"
+        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#fff",font=("Arial",28))
+        label.place(relheight=0.15,relwidth=0.9,relx=0.05,rely=0.05)
+        message="Tου μισθοδοτούμενου: "
+        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))#Name of employee
+        label.place(relheight=0.1,relwidth=0.4,relx=0.0,rely=0.15)
+        message=self.choice[0]+" "+self.choice[1]
+        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
+        label.place(relheight=0.1,relwidth=0.4,relx=0.35,rely=0.15)
+        message="Ημερομηνία Μισθοδοσίας: "
+        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
+        label.place(relheight=0.1,relwidth=0.5,relx=0.0,rely=0.225)
+
+        Date=tk.Label(mainFrame,text=value,bg="#fff",fg="#010101",font=("Arial",16))#Date of last paycheck
+        Date.place(relheight=0.05,relwidth=0.2,relx=0.475,rely=0.25)
+
+        label=tk.Label(mainFrame,text="Αναλυτικά",bg="#1b2135",fg="#fff",font=("Arial",20))
+        label.place(relheight=0.1,relwidth=0.4,relx=0.3,rely=0.3)
+
+        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        labelFrame.place(relheight=0.075,relwidth=0.85,relx=0.05,rely=0.4)
+        label=tk.Label(labelFrame,text="Μέρος από Ημερήσιες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.6)
+        label=tk.Label(labelFrame,text=str(selected["Ημερήσιες Αποδοχές"].iloc[0]),fg="#010101",bg="#fff",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.4,relx=0.61)
+
+        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        labelFrame.place(relheight=0.075,relwidth=0.8,relx=0.05,rely=0.525)
+        label=tk.Label(labelFrame,text="Μέρος από Ωριαίες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.6)
+        label=tk.Label(labelFrame,text=str(selected["Ωριαίες Αποδοχές"].iloc[0]),fg="#010101",bg="#fff",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.4,relx=0.61)
+
+        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.65)
+        label=tk.Label(labelFrame,text="Μέρος από Bonus:",fg="#fff",bg="#1b2135",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.5)
+        label=tk.Label(labelFrame,text=str(selected["Bonus"].iloc[0]),fg="#010101",bg="#fff",font=("Arial",18))
+        label.place(relheight=1,relwidth=0.3,relx=0.61)
+      
+        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.775)
+        label=tk.Label(labelFrame,text="Σύνολο:",bg="#1b2135",fg="#fff",font=("Arial",18,"bold"))
+        label.place(relheight=1,relwidth=0.5)
+        self.final=tk.Label(labelFrame,text=str(int(selected["Ωριαίες Αποδοχές"].iloc[0])+int(selected["Bonus"].iloc[0])+int(selected["Ημερήσιες Αποδοχές"].iloc[0])),fg="#010101",bg="#fff",font=("Arial",18),anchor="w")
+        self.final.place(relheight=1,relwidth=0.5,relx=0.4)
+
+        self.root.protocol("WM_DELETE_WINDOW",self.exit)
+        self.root.mainloop()

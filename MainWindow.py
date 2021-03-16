@@ -108,6 +108,7 @@ def main():
     Main.protocol("WM_DELETE_WINDOW",Exit)
     Main.mainloop()
 
+
 if __name__=="__main__":
     data=of.run(True)
     main()
