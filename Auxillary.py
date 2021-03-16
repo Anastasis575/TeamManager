@@ -648,7 +648,7 @@ class EditMovement(tk.Frame):
         values=["Έσοδο",
                 "Έξοδο"]
         textVar=tk.StringVar()
-        entry=tk.OptionMenu(labelFrame,textVar,*values,command=lambda choice: self.modifyChoices(True if choice=="Έσοδo" else False))
+        entry=tk.OptionMenu(labelFrame,textVar,*values,command=lambda choice: self.modifyChoices(True if choice=="Έσοδo" else False,self.typeEntry.get()))
         entry.config(font=('Arial',18))
         entry["menu"].config(font=('Arial',18))
         textVar.set("Έσοδο" if self.notes.loc[self.choice,"Έσοδο"]!=0 else "Έξοδο")
