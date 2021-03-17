@@ -236,6 +236,7 @@ class Athletes(tk.Frame):
             topCanvas.pack()
             self.topFrame=tk.Frame(topCanvas,bg="#1b2135")
             self.topFrame.pack()
+
             self.deleteVariable=tk.StringVar()
             self.deleteVariable.set("Αναζήτηση")
             self.deleteSearch=tk.Entry(self.topFrame,textvariable=self.deleteVariable,bg="grey")
@@ -774,15 +775,19 @@ class ProjectList(tk.Toplevel):
         self.topFrame.pack(expand=True)
         label=tk.Label(self.topFrame,text="Λίστα Οφειλών Μελών",font=("Arial",24),fg="#fff",bg="#1b2135")
         label.pack(padx=25,pady=15,anchor=tk.W,expand=True)
+        miniframe=tk.Frame(self.topFrame,bg="#1b2135")
+        miniframe.pack(padx=25,pady=15,anchor=tk.E)
         self.projectVariable=tk.StringVar()
         self.projectVariable.set("Αναζήτηση")
-        self.projectSearch=tk.Entry(self.topFrame,textvariable=self.projectVariable,bg="grey")
-        self.projectSearch.bind("<FocusIn>",func=lambda :self.projectVariable.set(""));
+        self.projectSearch=tk.Entry(miniframe,textvariable=self.projectVariable,bg="grey")
+        self.projectSearch.bind("<FocusIn>",func=lambda x:self.projectVariable.set(""));
         self.projectSearch.bind("<Return>",func=self.refreshTreeview)
         self.projectSearch.bind("<FocusOut>",func=self.refreshTreeview)
-        self.projectSearch.pack(padx=25,pady=15,anchor=tk.E)
+        self.projectSearch.pack(padx=20,side="right",ipady=8)
         self.projectSearch.config(font=("Arial",16))
 
+        self.emailButton=tk.Button(miniframe,text="Email",font=('Arial', 16),command=lambda : print(self.treeview.item(self.treeview.selection()[0],option="values")[5]))
+        self.emailButton.pack(side="right",expand=True)
         self.treeframe=tk.Frame(self.topFrame)
         self.treeframe.pack(padx=10,pady=25)
 
@@ -842,3 +847,6 @@ class ProjectList(tk.Toplevel):
     def endAction(self):
         self.master.w_c["Project"]=""
         self.destroy()
+
+    #def email(self):
+    #    print(self.treeview.selection())
