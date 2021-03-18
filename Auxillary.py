@@ -115,7 +115,7 @@ class viewDetails(tk.Frame):
 
     def complete(self):
         try:
-            if len(pd.date_range(start=self.TrueCoach["Τελευταία Μισθοδοσία"].to_timestamp(freq="D"),end=pd.Timestamp.now(),freq="MS"))==0:
+            if len(pd.date_range(start=self.lastDate.to_timestamp(freq="D"),end=pd.Timestamp.now(),freq="MS"))==0 or self.lastDate.to_timestamp(freq="D")==pd.to_datetime("1-1-2020"):
                 self.coach.loc[self.choice,"Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
                 self.coach.loc[self.choice,"Ωριαίες Αποδοχές"]=int(self.hourlyVar.get())
                 self.coach.loc[self.choice,"Bonus"]=int(self.bonusVar.get())
@@ -243,7 +243,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Σταθερό",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Σταθερό"])
+        textVar.set(self.coach.loc[self.choice,"Σταθερό"].iloc[0])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -255,7 +255,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Κινητό",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Κινητό"])
+        textVar.set(self.coach.loc[self.choice,"Κινητό"].iloc[0])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -268,7 +268,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Email",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Email"])
+        textVar.set(self.coach.loc[self.choice,"Email"].iloc[0])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -280,7 +280,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Διεύθυνση",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Διεύθυνση"])
+        textVar.set(self.coach.loc[self.choice,"Διεύθυνση"].iloc[0])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -292,7 +292,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Ημερομηνία Δημιουργίας",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Ημερομηνία Δημιουργίας"])
+        textVar.set(self.coach.loc[self.choice,"Ημερομηνία Δημιουργίας"].iloc[0])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
