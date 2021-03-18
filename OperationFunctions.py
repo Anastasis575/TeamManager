@@ -786,8 +786,10 @@ class ProjectList(tk.Toplevel):
         self.projectSearch.pack(padx=20,side="right",ipady=8)
         self.projectSearch.config(font=("Arial",16))
 
-        self.emailButton=tk.Button(miniframe,text="Email",font=('Arial', 16),command=lambda : print(self.treeview.item(self.treeview.selection()[0],option="values")[5]))
+        self.emailButton=tk.Button(miniframe,text="Αποστολή Email",font=('Arial', 16),command=lambda : print(self.treeview.item(self.treeview.selection()[0],option="values")[5]))
         self.emailButton.pack(side="right",expand=True)
+        self.emailAllButton=tk.Button(miniframe,text="Αποστολή σε όλους",font=('Arial', 16),command=lambda : print(self.treeview.item(self.treeview.selection()[0],option="values")[5]))
+        self.emailAllButton.pack(side="right",expand=True,padx=10)
         self.treeframe=tk.Frame(self.topFrame)
         self.treeframe.pack(padx=10,pady=25)
 
