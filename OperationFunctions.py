@@ -769,6 +769,7 @@ class ProjectList(tk.Toplevel):
         self.data=data
         self.imag={}
         self.top=super().__init__(master)
+        self.master.w_c["Project"]=self
         topCanvas=tk.Canvas(self,height=1200,width=2200)
         topCanvas.pack(expand=True)
         self.topFrame=tk.Frame(topCanvas,bg="#1b2135")
