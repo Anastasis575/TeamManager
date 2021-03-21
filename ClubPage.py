@@ -90,14 +90,21 @@ class Club(tk.Frame):
         self.view["menu"].config(font=("Arial",18))
         self.view.place(relwidth=0.3,relx=0.35,relheight=0.1,rely=0.75)
 
-        options1=["Από"]
+        label=tk.Label(self.headerFrame,text="Από:",bg="light grey",fg="black",font=("Arial",16))
+        label.place(relwidth=0.125,relx=0.5,relheight=0.1,rely=0.5)
+
+        options1=["-"]
         self.rangeA=tk.StringVar()
         self.rangeA.set(options1[0])
         self.begin_time=tk.OptionMenu(self.headerFrame,self.rangeA,*options1,command=lambda value: self.rangeA.set(value))
         self.begin_time.config(font=("Arial",18))
         self.begin_time["menu"].config(font=("Arial",18))
         self.begin_time.place(relwidth=0.125,relx=0.5,relheight=0.1,rely=0.6)
-        options2=["Μέχρι"]
+
+        label=tk.Label(self.headerFrame,text="Μέχρι:",bg="light grey",fg="black",font=("Arial",16))
+        label.place(relwidth=0.125,relx=0.35,relheight=0.1,rely=0.5)
+
+        options2=["-"]
         self.rangeB=tk.StringVar()
         self.rangeB.set(options2[0])
         self.end_time=tk.OptionMenu(self.headerFrame,self.rangeB,*options2,command=lambda value: self.rangeB.set(value))
@@ -114,20 +121,20 @@ class Club(tk.Frame):
         AthleteCreation.config(font=("Arial",36))
         AthleteCreation.place(relwidth=0.25,relheight=0.2,relx=0.025,rely=0.05)
 
-        languages={
-            "January":"Ιανουάριος",
-            "February":"Φεβρουάριος",
-            "March":"Μάρτιος",
-            "April":"Απρίλιος",
-            "May":"Μάιος",
-            "June":"Ιούνιος",
-            "July":"Ιούλιος",
-            "August":"Αύγουστος",
-            "September":"Σεπτέμβριος",
-            "October":"Οκτώβριος",
-            "November":"Νοέμβριος",
-            "December":"Δεκέμβριος",
-            }
+        #languages={
+        #    "January":"Ιανουάριος",
+        #    "February":"Φεβρουάριος",
+        #    "March":"Μάρτιος",
+        #    "April":"Απρίλιος",
+        #    "May":"Μάιος",
+        #    "June":"Ιούνιος",
+        #    "July":"Ιούλιος",
+        #    "August":"Αύγουστος",
+        #    "September":"Σεπτέμβριος",
+        #    "October":"Οκτώβριος",
+        #    "November":"Νοέμβριος",
+        #    "December":"Δεκέμβριος",
+        #    }
         #DropBar
         #self.dates=list(pd.date_range(pd.Timestamp.today()-pd.Timedelta(days=365),end=pd.Timestamp.today(),freq="MS"))
         #self.acronyms=[languages[i.month_name()] + " " + str(i.year) for i in self.dates]
@@ -247,21 +254,29 @@ class Club(tk.Frame):
             self.movements.pack(expand=True,fill=tk.BOTH)
             self.movementScroll.config(command=self.movements.yview)
         elif self.Variable.get()=="Ταμείο Συλλόγου":
+            self.begin_time["state"]=tk.NORMAL
+            self.end_time["state"]=tk.NORMAL
             self.rangeA.set("")
             self.begin_time["menu"].delete(0,'end')
-            self.begin_time["menu"].add_command(label="Από",command=lambda value="Από": self.rangeA.set("Από"))
-            self.rangeA.set("Από")
-            self.begin_time["state"]=tk.DISABLED
+            max=pd.to_datetime("1/1/2020")
+            for column in self.notes["Ημερομηνία"].unique():
+                temp=pd.to_datetime(column)
+                max=max if temp<=max else temp
+                self.begin_time["menu"].add_command(label=temp.to_period("D"),command=lambda value=temp.to_period("D"): self.set_date(value,"A"))
+            self.rangeA.set(max.to_period("D"))
             self.rangeB.set("")
             self.end_time["menu"].delete(0,'end')
-            self.end_time["menu"].add_command(label="Μέχρι",command=lambda value="Μέχρι": self.rangeB.set("Μέχρι"))
-            self.end_time["state"]=tk.DISABLED
-            self.rangeB.set("Μέχρι")
+            max=pd.to_datetime("1/1/2020")
+            for column in self.notes["Ημερομηνία"].unique():
+                temp=pd.to_datetime(column)
+                max=max if temp<=max else temp
+                self.end_time["menu"].add_command(label=temp.to_period("D"),command=lambda value=temp.to_period("D"): self.set_date(value,"B"))
+            self.rangeB.set(max.to_period("D"))
             if len(self.contentFrame.winfo_children())!=0:
                for i in self.contentFrame.winfo_children():
                    i.destroy()
             note=self.notes[self.notes["Ιδιωτικό"]==False]
-            self.createReceipt(note,self.rangeA.get(),self.rangeB.get())
+            self.createReceipt(note)
             #contentCanvas=tk.Canvas(self.contentFrame,bg="#474a48")
             #contentCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
             #contentScroll=ttk.Scrollbar(self.contentFrame,command=contentCanvas.yview)
@@ -403,7 +418,10 @@ class Club(tk.Frame):
                 self.salary.insert(parent="",index=tk.END,iid=count,values=(str(requestedDate),temp[1],temp[0],frame["Σύνολο"].iloc[0]))
                 count+=1
     
-    def createReceipt(self,note,start,end):
+    def createReceipt(self,note,start=None,end=None):
+        if len(self.contentFrame.winfo_children())!=0:
+            for i in self.contentFrame.winfo_children():
+                i.destroy()
         contentCanvas=tk.Canvas(self.contentFrame,bg="#474a48")
         contentCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
         contentScroll=ttk.Scrollbar(self.contentFrame,command=contentCanvas.yview)
@@ -416,37 +434,58 @@ class Club(tk.Frame):
         label.pack()
         revenue={}
         cost={}
+        total=0
+        if start!=None and end!=None:
+            Start=pd.to_datetime(start)
+            End=pd.to_datetime(end)
         for i in note["Τύπος"].unique():
             temp=note[note["Τύπος"].str.match(i)]
+            if start!=None and end!=None:
+                temp=temp[(Start<=pd.to_datetime(temp["Ημερομηνία"]))]
+                temp=temp[(End>=pd.to_datetime(temp["Ημερομηνία"]))]
             if temp["Έσοδο"].sum()!=0:
                 revenue[i]=temp["Έσοδο"].sum()
+                total+=temp["Έσοδο"].sum()
             if temp["Έξοδο"].sum()!=0:
                 cost[i]=temp["Έξοδο"].sum()
+                total-=temp["Έξοδο"].sum()
         labelFrame=tk.Frame(actualFrame,bg="#474a48")
         labelFrame.pack(fill=tk.X)
         label=tk.Label(labelFrame,text="\nΕξόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
         label.pack(fill=tk.X,side=tk.LEFT)
-        for content in cost:
+        if len(cost)!=0:
+            for content in cost:
+                labelFrame=tk.Frame(actualFrame,bg="#474a48")
+                labelFrame.pack(fill=tk.X)
+                label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+                label.pack(fill=tk.X,side=tk.LEFT)
+                label=tk.Label(labelFrame,text=str(cost[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
+                label.pack(fill=tk.X)
+        else:
             labelFrame=tk.Frame(actualFrame,bg="#474a48")
             labelFrame.pack(fill=tk.X)
-            label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+            label=tk.Label(labelFrame,text="Δεν υπάρχουν καταχωρήσεις εξόδων στην χρονική περίοδο αυτή",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=60)
             label.pack(fill=tk.X,side=tk.LEFT)
-            label=tk.Label(labelFrame,text=str(cost[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
-            label.pack(fill=tk.X)
         labelFrame=tk.Frame(actualFrame,bg="#474a48")
         labelFrame.pack(fill=tk.X)
         label=tk.Label(labelFrame,text="\nΕσόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
         label.pack(fill=tk.X,side=tk.LEFT)
-        for content in revenue:
+        if len(revenue)!=0:
+            for content in revenue:
+                labelFrame=tk.Frame(actualFrame,bg="#474a48")
+                labelFrame.pack(fill=tk.X)
+                label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+                label.pack(fill=tk.X,side=tk.LEFT)
+                label=tk.Label(labelFrame,text=str(revenue[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
+                label.pack(fill=tk.X)
+        else:
             labelFrame=tk.Frame(actualFrame,bg="#474a48")
             labelFrame.pack(fill=tk.X)
-            label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
+            label=tk.Label(labelFrame,text="Δεν υπάρχουν καταχωρήσεις εσόδων στην χρονική περίοδο αυτή",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=60)
             label.pack(fill=tk.X,side=tk.LEFT)
-            label=tk.Label(labelFrame,text=str(revenue[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
-            label.pack(fill=tk.X)
         labelFrame=tk.Frame(actualFrame,bg="#474a48")
         labelFrame.pack(fill=tk.X)
-        label=tk.Label(labelFrame,text="\n\nΣυνολικό Ταμείο: "+str(self.notes.iloc[0]["Ποσό"])+"€",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.CENTER)
+        label=tk.Label(labelFrame,text="\n\nΣυνολικό Ταμείο: "+str(self.notes.iloc[0]["Ποσό"])+"€"if start==None or end==None else "\n\nΤρέχων Άθροισμα: "+str(total),bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.CENTER)
         label.pack(fill=tk.X,side=tk.LEFT)
 
 
@@ -534,14 +573,13 @@ class Club(tk.Frame):
         if begin=="A":
             self.rangeA.set(value)
             if self.Variable.get()=="Οικονομικές Κινήσεις":
-                self.rangeA.set(value)
                 self.refreshMovements(0,self.rangeA.get(),self.rangeB.get())
-            elif self.Variable.get()=="Οικονομικές Κινήσεις":
-                pass
+            elif self.Variable.get()=="Ταμείο Συλλόγου":
+                self.createReceipt(self.notes,self.rangeA.get(),self.rangeB.get())
         else:
             self.rangeB.set(value)
             if self.Variable.get()=="Οικονομικές Κινήσεις":
                 self.refreshMovements(0,self.rangeA.get(),self.rangeB.get())
-            elif self.Variable.get()=="Οικονομικές Κινήσεις":
-                pass
+            elif self.Variable.get()=="Ταμείο Συλλόγου":
+                self.createReceipt(self.notes,self.rangeA.get(),self.rangeB.get())
 
