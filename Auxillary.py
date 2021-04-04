@@ -16,6 +16,7 @@ class viewDetails(tk.Frame):
             self.lastDate=self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"].iloc[0]
             self.TrueCoach=self.coach.loc[self.choice]
         else:
+            print(self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"])
             self.lastDate=self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"].max()
             self.TrueCoach=self.coach.loc[self.choice].where(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"]==self.lastDate).dropna()
         createCondition=len(pd.date_range(start=self.lastDate.to_timestamp(),end=pd.Timestamp.now(),freq="MS"))==0
