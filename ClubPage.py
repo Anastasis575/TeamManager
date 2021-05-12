@@ -11,27 +11,58 @@ notes=None
 coaches=None
 
 def readCalendar(first=False):
+    """Function that reads the Calendar.xlsx and deposit Club movements into a panda's Dataframe
+       first:bool
+            [DEPRACATED]... 
+    """
     notes=pd.read_excel("assets\\Calendar.xlsx")
     return notes
 
 
 def writeCalendar(notes):
+    """ Function that writes current version of the Movement Dataframe into the Calendar.xlsx
+        notes: pandas.Dataframe
+    """
     notes.to_excel("assets\\Calendar.xlsx",columns=["Ημερομηνία","Όνομα","Τύπος","Ποσό","Έσοδο","Έξοδο","Αιτιολογία","Ιδιωτικό"])
 
 
 def readCoaches(first=False):
-    coaches=pd.read_excel("assets\\Coaches.xlsx",parse_dates=["Τελευταία Μισθοδοσία"])
-    coaches["Τελευταία Μισθοδοσία"]=coaches["Τελευταία Μισθοδοσία"].apply(lambda x: x.to_period("D"))
+    """Function that reads the Coaches.xlsx and deposit coach info into a panda's Dataframe
+       first:bool
+            [DEPRACATED]... 
+    """
+    coaches=pd.read_excel("assets\\Coaches.xlsx",parse_dates=["Ημερομηνία Δημιουργίας"],sheet_name="1")
     coaches=coaches.set_index(["Επώνυμο","Όνομα"])
     return coaches
 
 
 def writeCoaches(coaches):
+    """ Function that writes current version of the Movement Dataframe into the Calendar.xlsx
+        notes: pandas.Dataframe
+    """
     for i in coaches.columns:
-        if i!="Τελευταία Μισθοδοσία":
+        if i!="Ημερομηνία Δημιουργίας":
             coaches[i]=coaches[i].astype("str")
-    coaches.to_excel("assets\\Coaches.xlsx")#,columns=["Επώνυμο","Όνομα","Σταθερό","Ποσό","Έσοδο","Έξοδο","Αιτιολογία","Ιδιωτικό"])
+    coaches.to_excel("assets\\Coaches.xlsx",sheet_name="1")#,columns=["Επώνυμο","Όνομα","Σταθερό","Ποσό","Έσοδο","Έξοδο","Αιτιολογία","Ιδιωτικό"])
 
+def readSalaries(first=False):
+    """Function that reads the Coaches.xlsx and deposit coach salary info into a panda's Dataframe
+       first:bool
+            [DEPRACATED]... 
+    """
+    salaries=pd.read_excel("assets\\Coaches2.xlsx",parse_dates=["Ημερομηνία"])
+    salaries=salaries.set_index("Index")
+    return salaries.dropna()
+
+
+def writeSalaries(salaries):
+    """ Function that writes current version of the Movement Dataframe into the Calendar.xlsx
+        notes: pandas.Dataframe
+    """
+    for i in salaries.columns:
+        if i!="Ημερομηνία":
+            salaries[i]=salaries[i].astype("str")
+    salaries.to_excel("assets\\Coaches2.xlsx")
 
 class Club(tk.Frame):
     def __init__(self,window,cha):
@@ -39,6 +70,7 @@ class Club(tk.Frame):
         self.changes=cha
         self.notes=readCalendar()
         self.coaches=readCoaches()
+        self.salaries=readSalaries()
         self.w_c={"Create":"",
                   "Edit":"",
                   "EditSalary":""}
@@ -120,7 +152,7 @@ class Club(tk.Frame):
         AthleteCreation=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΜελών",command=self.initAthlete,bg="#494949",fg="#fff")
         AthleteCreation.config(font=("Arial",36))
         AthleteCreation.place(relwidth=0.25,relheight=0.2,relx=0.025,rely=0.05)
-
+        #DEPRACATED!!!
         #languages={
         #    "January":"Ιανουάριος",
         #    "February":"Φεβρουάριος",
@@ -179,10 +211,6 @@ class Club(tk.Frame):
         self.changes.clear()
         self.window.deiconify()
         self.root.destroy()
-    def setStart(self):
-        pass
-    def setEnd(self):
-        pass
     def initAthlete(self):
         if self.changes.peekType()=="Athletes":
             self.changes.moveBack(self.root,"Club")
@@ -277,52 +305,10 @@ class Club(tk.Frame):
                    i.destroy()
             note=self.notes[self.notes["Ιδιωτικό"]==False]
             self.createReceipt(note)
-            #contentCanvas=tk.Canvas(self.contentFrame,bg="#474a48")
-            #contentCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
-            #contentScroll=ttk.Scrollbar(self.contentFrame,command=contentCanvas.yview)
-            #contentScroll.pack(side=tk.RIGHT,fill=tk.Y)
-            #contentCanvas.configure(yscrollcommand=contentScroll.set)
-            #contentCanvas.bind("<Configure>",lambda e: contentCanvas.configure(scrollregion=contentCanvas.bbox("all")))
-            #actualFrame=tk.Frame(self.contentFrame,bg="#474a48")
-            #contentCanvas.create_window((0,0),window=actualFrame,anchor=tk.NW,)
-            #label=tk.Label(actualFrame,text="Αναλυση Ταμείου Συλλόγου",bg="#474a48",fg="#fff",font=("Arial Black",22),justify=tk.CENTER)
-            #label.pack()
-            #revenue={}
-            #cost={}
-            #for i in note["Τύπος"].unique():
-            #    temp=note[note["Τύπος"].str.match(i)]
-            #    if temp["Έσοδο"].sum()!=0:
-            #        revenue[i]=temp["Έσοδο"].sum()
-            #    if temp["Έξοδο"].sum()!=0:
-            #        cost[i]=temp["Έξοδο"].sum()
-            #labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            #labelFrame.pack(fill=tk.X)
-            #label=tk.Label(labelFrame,text="\nΕξόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
-            #label.pack(fill=tk.X,side=tk.LEFT)
-            #for content in cost:
-            #    labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            #    labelFrame.pack(fill=tk.X)
-            #    label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
-            #    label.pack(fill=tk.X,side=tk.LEFT)
-            #    label=tk.Label(labelFrame,text=str(cost[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
-            #    label.pack(fill=tk.X)
-            #labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            #labelFrame.pack(fill=tk.X)
-            #label=tk.Label(labelFrame,text="\nΕσόδα:",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.LEFT)
-            #label.pack(fill=tk.X,side=tk.LEFT)
-            #for content in revenue:
-            #    labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            #    labelFrame.pack(fill=tk.X)
-            #    label=tk.Label(labelFrame,text=content+":",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT,width=15)
-            #    label.pack(fill=tk.X,side=tk.LEFT)
-            #    label=tk.Label(labelFrame,text=str(revenue[content])+"€",bg="#474a48",fg="#fff",font=("Arial",16),justify=tk.LEFT)
-            #    label.pack(fill=tk.X)
-            #labelFrame=tk.Frame(actualFrame,bg="#474a48")
-            #labelFrame.pack(fill=tk.X)
-            #label=tk.Label(labelFrame,text="\n\nΣυνολικό Ταμείο: "+str(self.notes.iloc[0]["Ποσό"])+"€",bg="#474a48",fg="#fff",font=("Arial",20),justify=tk.CENTER)
-            #label.pack(fill=tk.X,side=tk.LEFT)
+           
         elif self.Variable.get()=="Μισθοδοσίες":
             self.coach=readCoaches()
+            self.salaries=readSalaries()
             self.rangeA.set("")
             self.begin_time["menu"].delete(0,'end')
             self.begin_time["menu"].add_command(label="Από",command=lambda value="Από": self.rangeA.set("Από"))
@@ -343,8 +329,12 @@ class Club(tk.Frame):
             self.salaryScroll=ttk.Scrollbar(self.contentFrame)
             self.salaryScroll.pack(side=tk.RIGHT,fill=tk.Y)
             now=pd.Timestamp.today()
-            for group,frame in self.coaches.groupby(level=0):
-                condition=len(list(pd.date_range(start=frame["Τελευταία Μισθοδοσία"].iloc[0].to_timestamp(freq="D"),end=now,freq="MS")))>0
+            for group,frame in self.salaries.groupby(["Επώνυμο","Όνομα"]):
+                if len(frame)>1:
+                    lastDate=frame["Ημερομηνία"].max()
+                else:
+                    lastDate=frame["Ημερομηνία"].iloc[0]
+                condition=len(list(pd.date_range(start=lastDate,end=now,freq="MS")))>0
                 frame["Σύνολο"].iloc[0]=0 if condition else frame["Σύνολο"].iloc[0]
                 frame["Ημερήσιες Αποδοχές"].iloc[0]=0 if condition else frame["Ημερήσιες Αποδοχές"].iloc[0]
                 frame["Ωριαίες Αποδοχές"].iloc[0]=0 if condition else frame["Ωριαίες Αποδοχές"].iloc[0]
@@ -379,7 +369,7 @@ class Club(tk.Frame):
 
     def refreshMovements(self,value,dateA=None,dateB=None):
         """Recreates the Treeview with the desired information(Specifically Movements
-            @value: a non-avoidable 
+            #value: a non-avoidable 
         """
         if len(self.movements.get_children())!=0:
             for item in self.movements.get_children():
@@ -404,18 +394,21 @@ class Club(tk.Frame):
 
 
     def refreshSalaries(self,value):
-        if len(self.salary.get_children())!=0:
+        """Updates the general Treeview widgets with the coach information.
+        """
+        pass
+        if len(self.salary.get_children())!=0:#First deletes the entries on the treeview
             for item in self.salary.get_children():
                 self.salary.delete(item)
         count=0
-        if len(self.coaches)!=0:
-            for group,frame in self.coaches.sort_values("Τελευταία Μισθοδοσία").groupby(level=0):
-                temp=list(frame.index[0])
-                if len(frame["Τελευταία Μισθοδοσία"])==1:
-                    requestedDate=frame["Τελευταία Μισθοδοσία"].iloc[0]
-                else:
-                    requestedDate=frame["Τελευταία Μισθοδοσία"].max()
-                self.salary.insert(parent="",index=tk.END,iid=count,values=(str(requestedDate),temp[1],temp[0],frame["Σύνολο"].iloc[0]))
+        if len(self.salaries)!=0:#if there are salary entries
+            for group,frame in self.salaries.groupby(["Επώνυμο","Όνομα"]):#Loop over all salary entries and display information(date of last salary, name, name and total salary recorded)
+                temp=list(group)#Extracting Full Name
+                if len(frame["Ημερομηνία"])==1:#if exactly one salary entry exists we use it in the data presented
+                    requestedDate=frame["Ημερομηνία"].iloc[-1]
+                else:#if more than one exist we use the maximum date
+                    requestedDate=frame["Ημερομηνία"].max()
+                self.salary.insert(parent="",index=tk.END,iid=count,values=(str(requestedDate.to_period("D")),temp[1],temp[0],frame["Σύνολο"].iloc[-1]))#we create the treeview entry
                 count+=1
     
     def createReceipt(self,note,start=None,end=None):
@@ -491,36 +484,39 @@ class Club(tk.Frame):
 
 
 
-    def correctDate(self):
-        month=self.dates[self.search.current()].month
-        for group,frame in self.notes.groupby(lambda x:"a" if x["Ημερομηνία"].month==month else "b"):
-            if group=="a":
-                return frame
+    # def correctDate(self):
+    #     month=self.dates[self.search.current()].month
+    #     for group,frame in self.notes.groupby(lambda x:"a" if x["Ημερομηνία"].month==month else "b"):
+    #         if group=="a":
+    #             return frame
 
     def createEntry(self):
         if self.w_c["Create"]=="":
             if self.Variable.get()=="Οικονομικές Κινήσεις":
                 aux.createMovement(self,self.root,self.notes)
-            elif self.Variable.get()=="Μισθοδοσίες":
-                aux.createCoach(self,self.coach)
+            #elif self.Variable.get()=="Μισθοδοσίες":
+            #    aux.createCoach(self,self.coach,self.salaries)
         else:
             try:
                 self.w_c["Create"].deiconify()
-            except:
+            except Exception:
                 self.w_c["Create"].iconify()
-                self.w_c["Create"].deiconify();
+                self.w_c["Create"].deiconify()
 
     def viewSalary(self):
-        if self.w_c["EditSalary"]=="":
-            temp=self.salary.selection()
+        """A window to present the salary info including old entries.
+        """
+        if self.w_c["EditSalary"]=="":#if a window is not already initialised, then create a new 
+            pass
+            temp=self.salary.selection()#Exctracting the selected entry from the treeview
             if len(temp)!=0:
                 for item in temp:
                     choices=self.salary.item(item,option="values")[1:3]
-                init=aux.viewDetails(self,self.coaches,(choices[1],choices[0]))
-        else:
+                init=aux.viewDetails(self,self.coaches,self.salaries,(choices[1],choices[0]))#initialising the salary information window
+        else:#if there is an active window, try to deiconify
             try:
                 self.w_c["EditSalary"].deiconify()
-            except:
+            except Exception:#if it's already deiconified,we raise it to the top level by first iconifying it and then deiconifying it
                 self.w_c["EditSalary"].iconify()
                 self.w_c["EditSalary"].deiconify()
 
@@ -535,15 +531,15 @@ class Club(tk.Frame):
                     self.notes=self.notes.drop(self.notes[(self.notes["Ημερομηνία"].astype("str").str.match(choices[0])) &(self.notes["Όνομα"].str.match(choices[1]))&(self.notes["Τύπος"].str.match(choices[2]))].index[0])
                 writeCalendar(self.notes)
                 self.redraw()
-        elif self.Variable.get()=="Μισθοδοσίες":
-            temp=self.salary.selection()
-            if len(temp)!=0:
-                for item in temp:
-                    choices=self.salary.item(item,option="values")[1:3]
-                    print(self.coach.drop((choices[1],choices[0])))
-                    self.coach=self.coach.drop((choices[1],choices[0]))
-                writeCoaches(self.coach)
-                self.redraw()
+        #elif self.Variable.get()=="Μισθοδοσίες":
+        #    temp=self.salary.selection()
+        #    if len(temp)!=0:
+        #        for item in temp:
+        #            choices=self.salary.item(item,option="values")[1:3]
+        #            print(self.coach.drop((choices[1],choices[0])))
+        #            self.coach=self.coach.drop((choices[1],choices[0]))
+        #        writeCoaches(self.coach)
+        #        self.redraw()
 
     def editEntry(self):
         if self.w_c["Edit"]=="":
@@ -554,12 +550,12 @@ class Club(tk.Frame):
                         choices=self.movements.item(item,option="values")[:3]
                         individual=self.notes[(self.notes["Ημερομηνία"].astype("str").str.match(choices[0])) &(self.notes["Όνομα"].str.match(choices[1]))&(self.notes["Τύπος"].str.match(choices[2]))].index[0]
                     init=aux.EditMovement(self,individual,self.notes)
-            elif self.Variable.get()=="Μισθοδοσίες":
-                temp=self.salary.selection()
-                if len(temp)!=0:
-                    for item in temp:
-                        individual=self.salary.item(item,option="values")[1:3]
-                    init=aux.editCoach(self,self.coach,(individual[1],individual[0]))
+            #elif self.Variable.get()=="Μισθοδοσίες":
+            #    temp=self.salary.selection()
+            #    if len(temp)!=0:
+            #        for item in temp:
+            #            individual=self.salary.item(item,option="values")[1:3]
+            #        init=aux.editCoach(self,self.coach,(individual[1],individual[0]))
         else:
             try:
                 self.w_c["Edit"].deiconify()

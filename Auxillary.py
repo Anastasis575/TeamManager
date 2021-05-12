@@ -8,18 +8,24 @@ import pandas as pd
 import numpy as np
 
 class viewDetails(tk.Frame):
-    def __init__(self,master,coach,choice):
+    def __init__(self,master,coach,salaries,choice):
         self.master=master
         self.coach=coach
+        self.salaries=salaries
         self.choice=choice
-        if len(self.coach.loc[self.choice])==1:
-            self.lastDate=self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"].iloc[0]
-            self.TrueCoach=self.coach.loc[self.choice]
-        else:
-            print(self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"])
-            self.lastDate=self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"].max()
-            self.TrueCoach=self.coach.loc[self.choice].where(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"]==self.lastDate).dropna()
-        createCondition=len(pd.date_range(start=self.lastDate.to_timestamp(),end=pd.Timestamp.now(),freq="MS"))==0
+        #reduced=self.salaries.where((self.salaries["Όνομα"].str.contains(self.choice[1]))&(self.salaries["Επώνυμο"].str.contains(self.choice[0]))).dropna()
+        #print(reduced)
+        #if len(reduced)==1:
+        #    self.lastDate=reduced["Ημερομηνία"].iloc[0]
+        #    print(self.lastDate)
+        #    self.TrueCoach=reduced[reduced["Ημερομηνία"]==self.lastDate]
+        #    self.index=self.TrueCoach.index
+        #else:
+        #    self.lastDate=reduced["Ημερομηνία"].max()
+        #    print(self.lastDate)
+        #    self.TrueCoach=reduced[reduced["Ημερομηνία"]==self.lastDate]
+        #    self.index=self.TrueCoach.index
+        #createCondition=len(pd.date_range(start=self.lastDate,end=pd.Timestamp.now(),freq="MS"))==0
         self.root=tk.Toplevel(self.master.root)
         self.master.w_c["EditSalary"]=self.root
         self.root.title("Στοιχεία Μισθοδοσίας")
@@ -27,78 +33,93 @@ class viewDetails(tk.Frame):
         topCanvas.pack()
         mainFrame=tk.Frame(topCanvas,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
+        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        labelFrame.pack(fill=tk.X,pady=15)
+        tk.Label(mainFrame,text="Μισθοδοτικά στοιχεία",bg="#1b2135",fg="#fff",font=("Arial",28)).pack(fill=tk.X)
+        tk.Label(mainFrame,text="Tου μισθοδοτούμενου: {} {}".format(self.choice[0],self.choice[1]),bg="#1b2135",fg="#fff",font=("Arial",16)).pack(anchor=tk.W,pady=10)
+        tk.Label(mainFrame,text="Ημερομηνία:".format(self.choice[0],self.choice[1]),bg="#1b2135",fg="#fff",font=("Arial",16)).pack(side=tk.LEFT,anchor=tk.N,pady=10)
+        option=[pd.Timestamp.today()]
+        self.dateStr=tk.StringVar()
+        
+        #self.dateStr.set.option
+        #tk.OptionMenu(mainFrame,)
+
+
         #Intro Information
-        message="Μισθοδοτικά στοιχεία"
-        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#fff",font=("Arial",28))
-        label.place(relheight=0.15,relwidth=0.9,relx=0.05,rely=0.05)
-        message="Tου μισθοδοτούμενου: "
-        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))#Name of employee
-        label.place(relheight=0.1,relwidth=0.4,relx=0.0,rely=0.15)
-        message=self.choice[0]+" "+self.choice[1]
-        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
-        label.place(relheight=0.1,relwidth=0.4,relx=0.35,rely=0.15)
-        message="Ημερομηνία Μισθοδοσίας: "
-        label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
-        label.place(relheight=0.1,relwidth=0.5,relx=0.0,rely=0.225)
-        if len(self.coach.loc[self.choice])==1:
-            options=[self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"].iloc[0]]
-        else:
-            options=list(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"])
-        self.Past=tk.StringVar()#string variable to determine which month's
-        self.Past.set(options[-1])
-        #message=str(self.TrueCoach["Τελευταία Μισθοδοσία"].iloc[0])
-        Date=tk.OptionMenu(mainFrame,self.Past,*options,command=lambda value:self.PastSalary(value) if value!=self.lastDate else self.Past.set(self.lastDate))#Date of last paycheck
-        Date.config(bg="#fff",fg="#010101",font=("Arial",16))
-        Date["menu"].config(bg="#fff",fg="#010101",font=("Arial",16))
-        Date.place(relheight=0.05,relwidth=0.2,relx=0.45,rely=0.25)
+        #message="Μισθοδοτικά στοιχεία"
+        #label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#fff",font=("Arial",28))
+        #label.place(relheight=0.15,relwidth=0.9,relx=0.05,rely=0.05)
+        #message="Tου μισθοδοτούμενου: "
+        #label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))#Name of employee
+        #label.place(relheight=0.1,relwidth=0.4,relx=0.0,rely=0.15)
+        #message=self.choice[0]+" "+self.choice[1]
+        #label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
+        #label.place(relheight=0.1,relwidth=0.4,relx=0.35,rely=0.15)
+        #message="Ημερομηνία Μισθοδοσίας: "
+        #label=tk.Label(mainFrame,text=message,bg="#1b2135",fg="#bdbcb9",font=("Arial",16))
+        #label.place(relheight=0.1,relwidth=0.5,relx=0.0,rely=0.225)
+        #if len(reduced)==1:
+        #    options=[self.lastDate.to_period("D")]
+        #else:
+        #    options=[]
+        #    for group,frame in reduced.groupby(level=0):
+        #        options.append(frame["Ημερομηνία"].iloc[0].to_period("D"))
+        #self.Past=tk.StringVar()#string variable to determine which month's
+        #self.Past.set(options[-1])
+        ##message=str(self.TrueCoach["Τελευταία Μισθοδοσία"].iloc[0])
+        #Date=tk.OptionMenu(mainFrame,self.Past,*options,command=lambda value:self.PastSalary(value) if value!=self.lastDate else self.Past.set(self.lastDate))#Date of last paycheck
+        #Date.config(bg="#fff",fg="#010101",font=("Arial",16))
+        #Date["menu"].config(bg="#fff",fg="#010101",font=("Arial",16))
+        #Date.place(relheight=0.05,relwidth=0.2,relx=0.45,rely=0.25)
 
-        label=tk.Label(mainFrame,text="Αναλυτικά",bg="#1b2135",fg="#fff",font=("Arial",20))
-        label.place(relheight=0.1,relwidth=0.4,relx=0.3,rely=0.3)
+        #label=tk.Label(mainFrame,text="Αναλυτικά",bg="#1b2135",fg="#fff",font=("Arial",20))
+        #label.place(relheight=0.1,relwidth=0.4,relx=0.3,rely=0.3)
 
-        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
-        labelFrame.place(relheight=0.075,relwidth=0.85,relx=0.05,rely=0.4)
-        label=tk.Label(labelFrame,text="Μέρος από Ημερήσιες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
-        label.place(relheight=1,relwidth=0.6)
-        self.dailyVar=tk.StringVar()
-        self.dailyVar.set(self.TrueCoach["Ημερήσιες Αποδοχές"].iloc[0] if createCondition else 0)
-        self.dailyentry=tk.Entry(labelFrame,textvariable=self.dailyVar,bg="#fff",font=("Arial",18))
-        self.dailyentry.place(relheight=1,relwidth=0.4,relx=0.6)
-        self.dailyentry["state"]=tk.DISABLED
+        #labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        #labelFrame.place(relheight=0.075,relwidth=0.85,relx=0.05,rely=0.4)
+        #label=tk.Label(labelFrame,text="Μέρος από Ημερήσιες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
+        #label.place(relheight=1,relwidth=0.6)
+        #self.dailyVar=tk.StringVar()
+        #self.dailyVar.set(int(self.TrueCoach["Ημερήσιες Αποδοχές"].iloc[0]) if createCondition else 0)
+        #self.dailyentry=tk.Entry(labelFrame,textvariable=self.dailyVar,bg="#fff",font=("Arial",18))
+        #self.dailyentry.place(relheight=1,relwidth=0.4,relx=0.6)
+        #self.dailyentry["state"]=tk.DISABLED
 
-        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
-        labelFrame.place(relheight=0.075,relwidth=0.8,relx=0.05,rely=0.525)
-        label=tk.Label(labelFrame,text="Μέρος από Ωριαίες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
-        label.place(relheight=1,relwidth=0.6)
-        self.hourlyVar=tk.StringVar()
-        self.hourlyVar.set(self.TrueCoach["Ωριαίες Αποδοχές"].iloc[0] if createCondition else 0)
-        self.hourlyentry=tk.Entry(labelFrame,textvariable=self.hourlyVar,bg="#fff",font=("Arial",18))
-        self.hourlyentry.place(relheight=1,relwidth=0.4,relx=0.6)
-        self.hourlyentry["state"]=tk.DISABLED
+        #labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        #labelFrame.place(relheight=0.075,relwidth=0.8,relx=0.05,rely=0.525)
+        #label=tk.Label(labelFrame,text="Μέρος από Ωριαίες Αποδοχές:",fg="#fff",bg="#1b2135",font=("Arial",18))
+        #label.place(relheight=1,relwidth=0.6)
+        #self.hourlyVar=tk.StringVar()
+        #self.hourlyVar.set(int(self.TrueCoach["Ωριαίες Αποδοχές"].iloc[0])if createCondition else 0)
+        #self.hourlyentry=tk.Entry(labelFrame,textvariable=self.hourlyVar,bg="#fff",font=("Arial",18))
+        #self.hourlyentry.place(relheight=1,relwidth=0.4,relx=0.6)
+        #self.hourlyentry["state"]=tk.DISABLED
 
-        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
-        labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.65)
-        label=tk.Label(labelFrame,text="Μέρος από Bonus:",fg="#fff",bg="#1b2135",font=("Arial",18))
-        label.place(relheight=1,relwidth=0.5)
-        self.bonusVar=tk.StringVar()
-        self.bonusVar.set(self.TrueCoach["Bonus"].iloc[0] if createCondition else 0)
-        self.bonusentry=tk.Entry(labelFrame,textvariable=self.bonusVar,bg="#fff",font=("Arial",18))
-        self.bonusentry.place(relheight=1,relwidth=0.5,relx=0.5)
-        self.bonusentry["state"]=tk.DISABLED
-
-
-
-        labelFrame=tk.Frame(mainFrame,bg="#1b2135")
-        labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.775)
-        label=tk.Label(labelFrame,text="Σύνολο:",bg="#1b2135",fg="#fff",font=("Arial",18,"bold"))
-        label.place(relheight=1,relwidth=0.3,relx=0.2)
-        self.final=tk.Label(labelFrame,text=str(int(float(self.hourlyVar.get()))+int(float(self.bonusVar.get()))+int(float(self.dailyVar.get()))),fg="#010101",bg="#fff",font=("Arial",18),anchor="w")
-        self.final.place(relheight=1,relwidth=0.5,relx=0.5)
+        #labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        #labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.65)
+        #label=tk.Label(labelFrame,text="Μέρος από Bonus:",fg="#fff",bg="#1b2135",font=("Arial",18))
+        #label.place(relheight=1,relwidth=0.5)
+        #self.bonusVar=tk.StringVar()
+        #self.bonusVar.set(int(self.TrueCoach["Bonus"].iloc[0]) if createCondition else 0)
+        #self.bonusentry=tk.Entry(labelFrame,textvariable=self.bonusVar,bg="#fff",font=("Arial",18))
+        #self.bonusentry.place(relheight=1,relwidth=0.5,relx=0.5)
+        #self.bonusentry["state"]=tk.DISABLED
 
 
-        editButton=tk.Button(mainFrame,text="Επεξεργασία",command=self.enable,bg="#bec1c4",font=('Arial',18))
-        editButton.place(relheight=0.075,relwidth=0.4,relx=0.05,rely=0.9)
-        self.doneButton=tk.Button(mainFrame,text="Ολοκλήρωση",command=self.complete,bg="#bec1c4",font=('Arial',18))
-        self.doneButton.place(relheight=0.075,relwidth=0.4,relx=0.55,rely=0.9)
+
+        #labelFrame=tk.Frame(mainFrame,bg="#1b2135")
+        #labelFrame.place(relheight=0.075,relwidth=0.6,relx=0.05,rely=0.775)
+        #label=tk.Label(labelFrame,text="Σύνολο:",bg="#1b2135",fg="#fff",font=("Arial",18,"bold"))
+        #label.place(relheight=1,relwidth=0.3,relx=0.2)
+        #self.final=tk.Label(labelFrame,text=str(int(float(self.hourlyVar.get()))+int(float(self.bonusVar.get()))+int(float(self.dailyVar.get()))),fg="#010101",bg="#fff",font=("Arial",18),anchor="w")
+        #self.final.place(relheight=1,relwidth=0.5,relx=0.5)
+
+
+        buttonFrame=tk.Frame(mainFrame,bg="#1b2135")
+        buttonFrame.pack(side=tk.BOTTOM,fill=tk.X,ipady=25)
+        editButton=tk.Button(buttonFrame,text="Επεξεργασία",command=self.enable,bg="#bec1c4",font=('Arial',18)).pack(side=tk.LEFT,expand=True,anchor=tk.CENTER)
+        self.doneButton=tk.Button(buttonFrame,text="Ολοκλήρωση",command=self.complete,bg="#bec1c4",font=('Arial',18))
+        self.doneButton.pack(side=tk.LEFT,expand=True,anchor=tk.CENTER)
         self.doneButton["state"]=tk.DISABLED
 
         self.root.protocol("WM_DELETE_WINDOW",self.exit)
@@ -109,20 +130,24 @@ class viewDetails(tk.Frame):
         self.root.destroy()
 
     def enable(self):
+        """Enables the Entry Widgets and allows them to be interacted with.
+        """
         self.dailyentry["state"]=tk.NORMAL
         self.hourlyentry["state"]=tk.NORMAL
         self.bonusentry["state"]=tk.NORMAL
         self.doneButton["state"]=tk.NORMAL
 
     def complete(self):
+        """Corrects the data and saves it in the excel.
+        """
         try:
-            if len(pd.date_range(start=self.lastDate.to_timestamp(freq="D"),end=pd.Timestamp.now(),freq="MS"))==0 or self.lastDate.to_timestamp(freq="D")==pd.to_datetime("1-1-2020"):
-                self.coach.loc[self.choice,"Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
-                self.coach.loc[self.choice,"Ωριαίες Αποδοχές"]=int(self.hourlyVar.get())
-                self.coach.loc[self.choice,"Bonus"]=int(self.bonusVar.get())
-                self.coach.loc[self.choice,"Σύνολο"]=int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get())
+            if len(pd.date_range(start=self.lastDate,end=pd.Timestamp.now(),freq="MS"))==0 or self.lastDate==pd.to_datetime("1-1-2020"):
+                self.salaries.loc[self.index,"Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
+                self.salaries.loc[self.index,"Ωριαίες Αποδοχές"]=int(self.hourlyVar.get())
+                self.salaries.loc[self.index,"Bonus"]=int(self.bonusVar.get())
+                self.salaries.loc[self.index,"Σύνολο"]=int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get())
                 self.bonusVar.set(int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get()))
-                self.coach.loc[self.choice,"Τελευταία Μισθοδοσία"]=pd.Timestamp.now().to_period("D")
+                self.salaries.loc[self.index,"Ημερομηνία"]=pd.Timestamp.now().to_period("D")
             else:
                 temp=self.TrueCoach.copy()
                 temp["Ημερήσιες Αποδοχές"]=int(self.dailyVar.get())
@@ -131,14 +156,14 @@ class viewDetails(tk.Frame):
                 temp["Σύνολο"]=int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get())
                 self.bonusVar.set(int(self.dailyVar.get())+int(self.hourlyVar.get())+int(self.bonusVar.get()))
                 temp["Τελευταία Μισθοδοσία"]=pd.Timestamp.now().to_period("D")
-                self.coach=self.coach.append(temp)
-            pg.writeCoaches(self.coach)
+                self.salaries=self.salaries.append(temp)
+            pg.writeSalaries(self.salaries)
             self.master.redraw()
         except ValueError:
             mb.showinfo("Λάθος Είσοδος","Στα πεδία αποδοχών πρέπει να αναγραφεί το ποσό της αποδοχής, το οποίο είναι ένας ακέραιος αριθμός.")
     def PastSalary(self,value):
         self.Past.set(self.lastDate)
-        selected=self.coach.loc[self.choice].where(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"]==value).dropna()
+        selected=self.salaries.loc[self.choice].where(self.coach.loc[self.choice]["Τελευταία Μισθοδοσία"]==value).dropna()
         miniroot=tk.Toplevel(self.root)
         miniroot.title("Μισθοδωσία {}".format(value))
         topCanvas=tk.Canvas(miniroot,height=800,width=700,bg="#1b2135")
@@ -331,9 +356,10 @@ class editCoach(tk.Frame):
         for i in self.widget:
             self.widget[i]['state']=tk.NORMAL
 class createCoach(tk.Frame):
-    def __init__(self,master,coach,choice=None):
+    def __init__(self,master,coach,salaries,choice=None):
         self.master=master
         self.coach=coach
+        self.salaries=salaries
         self.choice=choice
         self.root=tk.Toplevel(self.master.root)
         self.master.w_c["Create"]=self.root
@@ -431,6 +457,16 @@ class createCoach(tk.Frame):
             self.exit()
             temp=pd.Series(data)
             self.coach=self.coach.reset_index().append(temp,ignore_index=True).set_index(["Επώνυμο","Όνομα"])
+            tempS={"Ημερομηνία":pd.to_datetime("1-1-2020"),
+                   "Ημερήσιες Αποδοχές":0,
+                   "Ωριαίες Αποδοχές":0,
+                   "Bonus":0,
+                   "Σύνολο":0,
+                   "Επώνυμο":data["Επώνυμο"],
+                   "Όνομα":data["Όνομα"]}
+            tempS=pd.Series(tempS)
+            salaries=salaries.append(tempS)
+            pg.writeSalaries(salaries)
             pg.writeCoaches(self.coach)
             self.master.redraw()
     def enable(self):
