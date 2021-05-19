@@ -52,7 +52,7 @@ def readSalaries(first=False):
     """
     salaries=pd.read_excel("assets\\Coaches2.xlsx",parse_dates=["Ημερομηνία"])
     salaries=salaries.set_index("Index")
-    return salaries.dropna()
+    return salaries.dropna(axis=1)
 
 
 def writeSalaries(salaries):
@@ -78,6 +78,7 @@ class Club(tk.Frame):
 
         #Initialisation and main instance variables initialization
         self.root=tk.Toplevel(window)
+        self.root.resizable(True,True)
         rootCanvas=tk.Canvas(self.root,height=1200,width=1400)
         rootCanvas.pack()
         super().__init__(self.root,bg="#4e73c2")
@@ -309,6 +310,7 @@ class Club(tk.Frame):
         elif self.Variable.get()=="Μισθοδοσίες":
             self.coach=readCoaches()
             self.salaries=readSalaries()
+            print(self.salaries)
             self.rangeA.set("")
             self.begin_time["menu"].delete(0,'end')
             self.begin_time["menu"].add_command(label="Από",command=lambda value="Από": self.rangeA.set("Από"))
@@ -396,7 +398,6 @@ class Club(tk.Frame):
     def refreshSalaries(self,value):
         """Updates the general Treeview widgets with the coach information.
         """
-        pass
         if len(self.salary.get_children())!=0:#First deletes the entries on the treeview
             for item in self.salary.get_children():
                 self.salary.delete(item)
