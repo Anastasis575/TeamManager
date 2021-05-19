@@ -3,7 +3,9 @@ import pandas as pd
 from PIL import ImageTk,Image
 import OperationFunctions as of
 import tkinter.messagebox as mb
+import CopyPaste as c
 import ClubPage as pg
+
 
 def main():
     change=of.windowManager()
@@ -104,10 +106,20 @@ def main():
     forphoto=ImageTk.PhotoImage(Image.open("assets\\next.png").resize((75,75)))
     forwardButton=tk.Button(headerFrame,image=forphoto,command=goForward,bg="light grey",borderwidth=0)
     forwardButton.place(relheight=0.225,relwidth=0.05,relx=0.95,rely=0.7)
-
+    c.make_textmenu(Main)
+    Main.bind_class("Entry", "<Button-3><ButtonRelease-3>", c.show_textmenu)
+    Main.bind_class("Entry", "<Control-a>", c.callback_select_all)
+    Main.bind_class("Entry", "<Control-c>", copy)
+    Main.bind_class("Entry", "<Control-x>", cut)
+    Main.bind_class("Entry", "<Control-p>", paste)
     Main.protocol("WM_DELETE_WINDOW",Exit)
     Main.mainloop()
-
+def copy(event):
+    event.widget.event_generate("<<Copy>>")
+def paste(event):
+    event.widget.event_generate("<<Paste>>")
+def cut(event):
+    event.widget.event_generate("<<Cut>>")
 
 if __name__=="__main__":
     data=of.run(True)
