@@ -489,12 +489,12 @@ class createMovement(tk.Frame):
         self.master=window
         self.window=root
         self.notes=notes
-        self.root=tk.Toplevel(self.master)
+        self.root=tk.Toplevel(self.master,bg="#1b2135")
+        self.root.resizable(True,True)
+        self.root.geometry("800x800")
         self.root.title("Δήλωση Οικονομικού Γεγονότος")
         self.window.w_c["Create"]=self.root
-        createCanvas=tk.Canvas(self.root,bg="#1b2135",height=800,width=800)
-        createCanvas.pack()
-        mainFrame=tk.Frame(createCanvas,bg="#1b2135")
+        mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
 
         self.entries={}
@@ -632,11 +632,11 @@ class EditMovement(tk.Frame):
         self.master=root
         self.choice=indi
         self.notes=notes
-        self.root=tk.Toplevel(self.master.root)
+        self.root=tk.Toplevel(self.master.root,bg="#1b2135")
+        self.root.geometry("800x800")
+        self.root.resizable(True,True)
         self.master.w_c["Edit"]=self.root
-        createCanvas=tk.Canvas(self.root,bg="#1b2135",height=800,width=800)
-        createCanvas.pack()
-        mainFrame=tk.Frame(createCanvas,bg="#1b2135")
+        mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
         self.widgets={}
         self.entries={}
