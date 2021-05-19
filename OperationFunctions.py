@@ -43,9 +43,9 @@ class Athletes(tk.Frame):
     def __init__(self,window,cha):
         window.iconify()
         #Initialisation and main instance variables initialization
-        self.root=tk.Toplevel(window)
-        rootCanvas=tk.Canvas(self.root,height=1200,width=1400)
-        rootCanvas.pack()
+        self.root=tk.Toplevel(window,bg="#4e73c2")
+        self.root.geometry("1000x900")
+        self.root.resizable(True,True)
         super().__init__(self.root,bg="#4e73c2")
         super().place(relheight=1,relwidth=1)
         self.changes = cha
@@ -197,12 +197,12 @@ class Athletes(tk.Frame):
 
     def createEntry(self):#Create New entry
         if self.w_c["Create"]=="":
-            self.top=tk.Toplevel(self.root)
+            self.top=tk.Toplevel(self.root,bg="#1b2135")
+            self.top.geometry("400x400")
+            self.top.resizable(True,True)
             self.w_c["Create"]=self.top
             self.top.title("Είδος Νέου Μέλους")
-            canvas=tk.Canvas(self.top,height=400,width=400)
-            canvas.grid(row=0,column=0,rowspan=8,columnspan=8)
-            frame=tk.Frame(canvas,bg="#1b2135")
+            frame=tk.Frame(self.top,bg="#1b2135")
             frame.grid(row=0,column=0,rowspan=8,columnspan=8)
             label=tk.Label(frame,text="Επιλεξτε το είδος του νέου μέλους")
             label.config(font=("Arial",18))
@@ -229,12 +229,12 @@ class Athletes(tk.Frame):
 
     def deleteEntry(self):
         if self.w_c["Delete"]=="":
-            self.top=self.top=tk.Toplevel(self.root)
+            self.top=self.top=tk.Toplevel(self.root,bg="#1b2135")
+            self.top.geometry("800x500")
+            self.top.resizable(True,True)
             self.top.title("Διαγραφή Στοιχείου")
             self.w_c["Delete"]=self.top
-            topCanvas=tk.Canvas(self.top,height=800,width=500)
-            topCanvas.pack()
-            self.topFrame=tk.Frame(topCanvas,bg="#1b2135")
+            self.topFrame=tk.Frame(self.top,bg="#1b2135")
             self.topFrame.pack()
 
             self.deleteVariable=tk.StringVar()
@@ -388,10 +388,10 @@ class ItemButton(tk.Button):
     def produceData(self):
         #The more information window
         self.root.disableAll()
-        self.top=tk.Toplevel()
+        self.top=tk.Toplevel(bg="#1b2135")
+        self.root.geometry("800x500")
+        self.root.resizable(True,True)
         self.top.title(self.textName)
-        topCanvas=tk.Canvas(self.top,height=800,width=500)
-        topCanvas.pack()
         self.topFrame=tk.Frame(self.top,bg="#1b2135")
         self.topFrame.place(relheight=1,relwidth=1,relx=0,rely=0)
         self.frames={}
@@ -621,12 +621,12 @@ class ItemCreation(tk.Frame):
         self.entries={}
 
 
-        self.root=tk.Toplevel(self.window)
+        self.root=tk.Toplevel(self.window,bg="#1b2135")
+        self.root.geometry("800x600")
+        self.root.resizable(True,True)
         self.father.w_c["Create"]=self.root
         self.root.title("Δημιουργία: "+self.state)
-        Canvas=tk.Canvas(self.root,height=800,width=600)
-        Canvas.pack()
-        super().__init__(Canvas,**kwargs)
+        super().__init__(self.root,**kwargs)
         super().place(relheight=1,relwidth=1)
 
         for i in self.check().reset_index().columns:
@@ -769,10 +769,10 @@ class ProjectList(tk.Toplevel):
         self.data=data
         self.imag={}
         self.top=super().__init__(master)
+        self.top.geometry("1200x2200")
+        self.top.resizable(True,True)
         self.master.w_c["Project"]=self
-        topCanvas=tk.Canvas(self,height=1200,width=2200)
-        topCanvas.pack(expand=True)
-        self.topFrame=tk.Frame(topCanvas,bg="#1b2135")
+        self.topFrame=tk.Frame(self.top,bg="#1b2135")
         self.topFrame.pack(expand=True)
         label=tk.Label(self.topFrame,text="Λίστα Οφειλών Μελών",font=("Arial",24),fg="#fff",bg="#1b2135")
         label.pack(padx=25,pady=15,anchor=tk.W,expand=True)
