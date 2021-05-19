@@ -52,7 +52,7 @@ class viewDetails(tk.Frame):
         # The date of this month's wage creation or the today's date if no wage info exist for this month
         tk.Label(smallframe,text="Ημερομηνία:".format(self.choice[0],self.choice[1]),bg="#1b2135",fg="#fff",font=("Arial",16)).pack(side=tk.LEFT,anchor=tk.CENTER,padx=105,fill=tk.X)
         option=[str(frame["Ημερομηνία"].iloc[0].to_period("D")) for group,frame in reduced.groupby(level=0)]
-        if self.createCondition:
+        if self.createCondition  and self.lastDate!=pd.to_datetime("1-1-2020"):
             option.append(str(pd.Timestamp.now().to_period("D")))
         if len(option)>1:
             option.sort(key=lambda x:pd.to_datetime(x),reverse=True)
@@ -164,7 +164,6 @@ class viewDetails(tk.Frame):
     def PastSalary(self,value):
         #self.Past.set(self.lastDate)
         if len(pd.date_range(start=self.dateStr.get(),end=Timestamp.today(),freq="MS"))<1:
-            print(not enough )
             return
         reduced=self.salaries.where((self.salaries["Όνομα"].str.contains(self.choice[1]))&(self.salaries["Επώνυμο"].str.contains(self.choice[0]))).dropna()
         selected=reduced.where((reduced["Ημερομηνία"]==pd.to_datetime(self.dateStr.get()))).dropna()
@@ -362,13 +361,12 @@ class createCoach(tk.Frame):
         self.coach=coach
         self.salaries=salaries
         self.choice=choice
-        self.root=tk.Toplevel(self.master.root)
+        self.root=tk.Toplevel(self.master.root,bg="#1b2135")
         self.master.w_c["Create"]=self.root
         self.root.title("Δημιουργία Μισθοδοτούμενου")
         self.root.resizable(True,True)
-        topCanvas=tk.Canvas(self.root,height=1000,width=900,bg="#1b2135")
-        topCanvas.pack()
-        mainFrame=tk.Frame(topCanvas,bg="#1b2135")
+        self.root.geometry("1000x900")
+        mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
         self.entries={}
 
@@ -450,7 +448,7 @@ class createCoach(tk.Frame):
         self.master.w_c["Create"]=self.root
         self.root.destroy()
     def complete(self):
-        data={"Τελευταία Μισθοδοσία":pd.to_datetime("1/1/2020",dayfirst=True).to_period("D"),"Σύνολο":0,"Ημερήσιες Αποδοχές":0,"Bonus":0,"Ημερομηνία Δημιουργίας":pd.Timestamp.now().to_period("D")}
+        data={"Ημερομηνία Δημιουργίας":pd.Timestamp.now()}
         for i in self.entries:
             data[i]=self.entries[i].get() if self.entries[i].get()!=""else "-"
         if data["Όνομα"]=="-" or  data["Επώνυμο"]=="-":
@@ -459,16 +457,19 @@ class createCoach(tk.Frame):
             self.exit()
             temp=pd.Series(data)
             self.coach=self.coach.reset_index().append(temp,ignore_index=True).set_index(["Επώνυμο","Όνομα"])
+            self.salaries=self.salaries.reset_index().drop("Index",axis=1)
             tempS={"Ημερομηνία":pd.to_datetime("1-1-2020"),
-                   "Ημερήσιες Αποδοχές":0,
-                   "Ωριαίες Αποδοχές":0,
-                   "Bonus":0,
-                   "Σύνολο":0,
-                   "Επώνυμο":data["Επώνυμο"],
-                   "Όνομα":data["Όνομα"]}
+                    "Τελευταία Μισθοδοσία":pd.to_datetime("1-1-2020").to_period("D"),
+                    "Ημερήσιες Αποδοχές":0,
+                    "Ωριαίες Αποδοχές":0,
+                    "Bonus":0,
+                    "Σύνολο":0,
+                    "Επώνυμο":data["Επώνυμο"],
+                    "Όνομα":data["Όνομα"]}
             tempS=pd.Series(tempS)
-            salaries=self.salaries.append(tempS)
-            pg.writeSalaries(salaries)
+            self.salaries=self.salaries.append(tempS,ignore_index=True)
+            self.salaries.index=self.salaries.index.rename("Index")
+            pg.writeSalaries(self.salaries)
             pg.writeCoaches(self.coach)
             self.master.redraw()
     def enable(self):

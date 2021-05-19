@@ -310,7 +310,6 @@ class Club(tk.Frame):
         elif self.Variable.get()=="Μισθοδοσίες":
             self.coach=readCoaches()
             self.salaries=readSalaries()
-            print(self.salaries)
             self.rangeA.set("")
             self.begin_time["menu"].delete(0,'end')
             self.begin_time["menu"].add_command(label="Από",command=lambda value="Από": self.rangeA.set("Από"))
@@ -334,8 +333,10 @@ class Club(tk.Frame):
             for group,frame in self.salaries.groupby(["Επώνυμο","Όνομα"]):
                 if len(frame)>1:
                     lastDate=frame["Ημερομηνία"].max()
-                else:
+                elif len(frame)==1:
                     lastDate=frame["Ημερομηνία"].iloc[0]
+                else:
+                    mb.showwarning("Προσοχή", "Δεν υπάρχουν Προπονητές.\nΠροσθέστε καινούργιους προπονητές")
                 condition=len(list(pd.date_range(start=lastDate,end=now,freq="MS")))>0
                 frame["Σύνολο"].iloc[0]=0 if condition else frame["Σύνολο"].iloc[0]
                 frame["Ημερήσιες Αποδοχές"].iloc[0]=0 if condition else frame["Ημερήσιες Αποδοχές"].iloc[0]
@@ -495,8 +496,8 @@ class Club(tk.Frame):
         if self.w_c["Create"]=="":
             if self.Variable.get()=="Οικονομικές Κινήσεις":
                 aux.createMovement(self,self.root,self.notes)
-            #elif self.Variable.get()=="Μισθοδοσίες":
-            #    aux.createCoach(self,self.coach,self.salaries)
+            elif self.Variable.get()=="Μισθοδοσίες":
+               aux.createCoach(self,self.coach,self.salaries)
         else:
             try:
                 self.w_c["Create"].deiconify()
