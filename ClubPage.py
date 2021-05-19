@@ -533,15 +533,23 @@ class Club(tk.Frame):
                     self.notes=self.notes.drop(self.notes[(self.notes["Ημερομηνία"].astype("str").str.match(choices[0])) &(self.notes["Όνομα"].str.match(choices[1]))&(self.notes["Τύπος"].str.match(choices[2]))].index[0])
                 writeCalendar(self.notes)
                 self.redraw()
-        #elif self.Variable.get()=="Μισθοδοσίες":
-        #    temp=self.salary.selection()
-        #    if len(temp)!=0:
-        #        for item in temp:
-        #            choices=self.salary.item(item,option="values")[1:3]
-        #            print(self.coach.drop((choices[1],choices[0])))
-        #            self.coach=self.coach.drop((choices[1],choices[0]))
-        #        writeCoaches(self.coach)
-        #        self.redraw()
+        elif self.Variable.get()=="Μισθοδοσίες":
+            temp=self.salary.selection()
+            if len(temp)!=0:
+                for item in temp:
+                    choices=self.salary.item(item,option="values")[1:3]
+                    self.coach=self.coach.drop((choices[1],choices[0]))
+                    ids=[]
+                    for group,frame in self.salaries.groupby(level=0):
+                        if frame.loc[group,"Όνομα"]==choices[0] and frame.loc[group,"Επώνυμο"]==choices[1]:
+                            ids.append(group)
+                    for id in ids:
+                        self.salaries=self.salaries.drop(id)
+                    self.salaries=self.salaries.reset_index().drop("Index",axis=1)
+                    self.salaries.index=self.salaries.index.rename("Index")
+                writeCoaches(self.coach)
+                writeSalaries(self.salaries)
+                self.redraw()
 
     def editEntry(self):
         if self.w_c["Edit"]=="":
@@ -552,12 +560,12 @@ class Club(tk.Frame):
                         choices=self.movements.item(item,option="values")[:3]
                         individual=self.notes[(self.notes["Ημερομηνία"].astype("str").str.match(choices[0])) &(self.notes["Όνομα"].str.match(choices[1]))&(self.notes["Τύπος"].str.match(choices[2]))].index[0]
                     init=aux.EditMovement(self,individual,self.notes)
-            #elif self.Variable.get()=="Μισθοδοσίες":
-            #    temp=self.salary.selection()
-            #    if len(temp)!=0:
-            #        for item in temp:
-            #            individual=self.salary.item(item,option="values")[1:3]
-            #        init=aux.editCoach(self,self.coach,(individual[1],individual[0]))
+            elif self.Variable.get()=="Μισθοδοσίες":
+               temp=self.salary.selection()
+               if len(temp)!=0:
+                   for item in temp:
+                       individual=self.salary.item(item,option="values")[1:3]
+                   init=aux.editCoach(self,self.coach,(individual[1],individual[0]))
         else:
             try:
                 self.w_c["Edit"].deiconify()

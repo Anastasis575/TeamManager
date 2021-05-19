@@ -226,19 +226,19 @@ class editCoach(tk.Frame):
         self.master=master
         self.coach=coach
         self.choice=choice
-        self.root=tk.Toplevel(self.master.root)
+        self.root=tk.Toplevel(self.master.root,bg="#1b2135")
         self.root.title("Δημιουργία Μισθοδοτούμενου")
+        self.root.geometry("1000x900")
+        self.root.resizable(True,True)
         self.master.w_c["Edit"]=self.root
-        topCanvas=tk.Canvas(self.root,height=1000,width=900,bg="#1b2135")
-        topCanvas.pack()
-        mainFrame=tk.Frame(topCanvas,bg="#1b2135")
+        mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
         self.entries={}
         self.widget={}
 
         message="Τα Στοιχεία του Μισθοδοτούμενου"
         label=tk.Label(mainFrame,bg="#1b2135",text=message,font=("Arial",24),fg="#bdbcb9")
-        label.place(relheigh=0.125,relwidth=0.9,relx=0.05,rely=0.025)
+        label.place(relheigh=0.125,relwidth=0.9,relx=0.05)
         labelFrame=tk.Frame(mainFrame,bg="#1b2135")
         labelFrame.place(relheight=0.2,relwidth=0.4,relx=0.05,rely=0.1)
         label=tk.Label(labelFrame,text="Επώνυμο",bg="#1b2135",fg="#fff",font=('Arial',18))
@@ -269,7 +269,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Σταθερό",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Σταθερό"].iloc[0])
+        textVar.set(self.coach.loc[self.choice,"Σταθερό"])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -281,7 +281,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Κινητό",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Κινητό"].iloc[0])
+        textVar.set(self.coach.loc[self.choice,"Κινητό"])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -294,7 +294,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Email",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Email"].iloc[0])
+        textVar.set(self.coach.loc[self.choice,"Email"])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -306,7 +306,7 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Διεύθυνση",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Διεύθυνση"].iloc[0])
+        textVar.set(self.coach.loc[self.choice,"Διεύθυνση"])
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
@@ -318,12 +318,12 @@ class editCoach(tk.Frame):
         label=tk.Label(labelFrame,text="Ημερομηνία Δημιουργίας",bg="#1b2135",fg="#fff",font=('Arial',18))
         label.place(relheight=0.5,relwidth=1)
         textVar=tk.StringVar()
-        textVar.set(self.coach.loc[self.choice,"Ημερομηνία Δημιουργίας"].iloc[0])
+        textVar.set(self.coach.loc[self.choice,"Ημερομηνία Δημιουργίας"].to_period("D"))
         entry=tk.Entry(labelFrame,textvariable=textVar,font=('Arial',18))
         entry.place(relheight=0.5,relwidth=1,rely=0.5)
         entry["state"]=tk.DISABLED
         self.entries["Ημερομηνία Δημιουργίας"]=textVar
-        self.widget["Ημερομηνία Δημιουργίας"]=entry
+        #self.widget["Ημερομηνία Δημιουργίας"]=entry
 
 
         editButton=tk.Button(mainFrame,text="Επεξεργασία",command=self.enable,bg="#bec1c4",font=('Arial',18))
@@ -344,6 +344,16 @@ class editCoach(tk.Frame):
         if data["Όνομα"]=="-" or  data["Επώνυμο"]=="-":
             mb.showinfo("Σφάλμα Εισόδου","Για να ολοκληρωθεί η δημιουργία του μισθοδοτούμενου πρέπει να δωθεί το όνομα και το επώνυμο του.")
         else:
+            if data["Όνομα"]!=self.choice[1] or  data["Επώνυμο"]==self.choice[0]:
+                salaries=pg.readSalaries()
+                ids=[]
+                for group,frame in salaries.groupby(level=0):
+                    if frame.loc[group,"Όνομα"]==self.choice[1] and frame.loc[group,"Επώνυμο"]==self.choice[0]:
+                        ids.append(group)
+                for id in ids:
+                    salaries.loc[id,"Όνομα"]=data["Όνομα"]
+                    salaries.loc[id,"Επώνυμο"]=data["Επώνυμο"]
+                pg.writeSalaries(salaries)
             self.coach=self.coach.reset_index()
             ind=self.coach[(self.coach["Επώνυμο"].str.match(self.choice[0]))&(self.coach["Όνομα"].str.match(self.choice[1]))].index[0]
             for i in data:
