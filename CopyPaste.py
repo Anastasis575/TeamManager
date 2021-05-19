@@ -1,5 +1,5 @@
 import tkinter as tk
-
+#credit to angeloped GithubGist
 def make_textmenu(root):
 	global the_menu
 	the_menu = tk.Menu(root, tearoff=0)
