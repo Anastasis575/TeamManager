@@ -17,3 +17,4 @@ build/
 Run_app.bat
 IDONOTWANTTOLOSEMYCODE.txt
 /.vscode/
+*.spec
