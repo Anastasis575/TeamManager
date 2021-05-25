@@ -30,13 +30,13 @@ def main():
         change.moveBack(Main,"Main")
     def goForward():
         change.moveForward(Main,"Main")
-    def configuring(event):
-        headerFrame.update()
-        h=headerFrame.winfo_height()*hE
-        w=headerFrame.winfo_width()*wE
-        imag=ImageTk.PhotoImage(Image.open("assets\\Esperos.png").resize((int(h),int(w))))
-        logo.config(imag=imag)
-        logo.imag=imag
+    # def configuring(event):
+    #     headerFrame.update()
+    #     h=headerFrame.winfo_height()*hE
+    #     w=headerFrame.winfo_width()*wE
+    #     imag=ImageTk.PhotoImage(Image.open("assets\\Esperos.png").resize((int(h),int(w))))
+    #     logo.config(imag=imag)
+    #     logo.imag=imag
 
 
     Main=tk.Tk()

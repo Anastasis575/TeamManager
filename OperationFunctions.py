@@ -76,23 +76,23 @@ class Athletes(tk.Frame):
 
         #Back Button
         backphoto=ImageTk.PhotoImage(Image.open("assets\\back.png").resize((75,75)))
-        backButton=tk.Button(self.headerFrame,image=backphoto,command=self.goBack,bg="light grey",borderwidth=0)
-        backButton.place(relheight=0.225,relwidth=0.05,relx=0.9,rely=0.7)
+        self.backButton=tk.Button(self.headerFrame,image=backphoto,command=self.goBack,bg="light grey",borderwidth=0)
+        self.backButton.place(relheight=0.225,relwidth=0.05,relx=0.9,rely=0.7)
 
         #Forward Button
         forphoto=ImageTk.PhotoImage(Image.open("assets\\next.png").resize((75,75)))
-        forwardButton=tk.Button(self.headerFrame,image=forphoto,command=self.goForward,bg="light grey",borderwidth=0)
-        forwardButton.place(relheight=0.225,relwidth=0.05,relx=0.95,rely=0.7)
+        self.forwardButton=tk.Button(self.headerFrame,image=forphoto,command=self.goForward,bg="light grey",borderwidth=0)
+        self.forwardButton.place(relheight=0.225,relwidth=0.05,relx=0.95,rely=0.7)
 
         #Create button, to create a new entry
-        createButton=tk.Button(self.headerFrame,bg="#c1c1c1",text="Δημιουργία Καινούργιας Εγγραφής",command=self.createEntry,borderwidth=0)
-        createButton.config(font=("Arial",15))
-        createButton.place(relheight=0.15,relwidth=0.25,relx=0.3,rely=0.5)
+        self.createButton=tk.Button(self.headerFrame,bg="#c1c1c1",text="Δημιουργία Καινούργιας Εγγραφής",command=self.createEntry,borderwidth=0)
+        self.createButton.config(font=("Arial",15))
+        self.createButton.place(relheight=0.15,relwidth=0.25,relx=0.3,rely=0.5)
 
         #Delete button, to delete an existing entry
-        deleteButton=tk.Button(self.headerFrame,bg="#c1c1c1",text="Διαγραφή Υπάρχουσας Εγγραφής",command=self.deleteEntry,borderwidth=0)
-        deleteButton.config(font=("Arial",16))
-        deleteButton.place(relheight=0.15,relwidth=0.25,relx=0.3,rely=0.7)
+        self.deleteButton=tk.Button(self.headerFrame,bg="#c1c1c1",text="Διαγραφή Υπάρχουσας Εγγραφής",command=self.deleteEntry,borderwidth=0)
+        self.deleteButton.config(font=("Arial",16))
+        self.deleteButton.place(relheight=0.15,relwidth=0.25,relx=0.3,rely=0.7)
 
         #Choice box about the category of the data
         options=["Επιλέξτε μια κατηγορία μέλους"]
@@ -119,9 +119,9 @@ class Athletes(tk.Frame):
         self.type["state"]=tk.DISABLED
 
         #Club page creation button
-        teamButton=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΣυλόγου",command=self.initClub,bg="#494949",fg="#fff")
-        teamButton.config(font=("Arial",36))
-        teamButton.place(relwidth=0.25,relheight=0.2,relx=0.025,rely=0.05)
+        self.teamButton=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΣυλόγου",command=self.initClub,bg="#494949",fg="#fff")
+        self.teamButton.config(font=("Arial",36))
+        self.teamButton.place(relwidth=0.25,relheight=0.2,relx=0.025,rely=0.05)
 
         #Main data frame for objects
         basicFrame=tk.Frame(self.subHeaderFrame,bg="#1b2135")
@@ -135,13 +135,13 @@ class Athletes(tk.Frame):
         self.listFrame=ItemList(self,self.data,"#1b2135")
         self.mainCanvas.create_window((0,0),window=self.listFrame,anchor=tk.NW,width=1060,height=1330) #Be Careful
 
-        ProjectButton=tk.Button(self.subHeaderFrame,bg="#494949",fg="#fff",text="Εμφάνιση Λίστας Εκκρεμοτήττων",command=self.projectData,borderwidth=0)
-        ProjectButton.config(font=("Arial",16))
-        ProjectButton.place(relwidth=0.25,relheight=0.15,relx=0.025,rely=0.45)
+        self.ProjectButton=tk.Button(self.subHeaderFrame,bg="#494949",fg="#fff",text="Εμφάνιση Λίστας Εκκρεμοτήττων",command=self.projectData,borderwidth=0)
+        self.ProjectButton.config(font=("Arial",16))
+        self.ProjectButton.place(relwidth=0.25,relheight=0.15,relx=0.025,rely=0.45)
         #Save button
-        saveButton=tk.Button(self.subHeaderFrame,text="Αποθήκευση",command=self.save,bg="#494949",fg="#fff")
-        saveButton.config(font=("Arial",38))
-        saveButton.place(relwidth=0.25,relheight=0.175,relx=0.025,rely=0.675)
+        # saveButton=tk.Button(self.subHeaderFrame,text="Αποθήκευση",command=self.save,bg="#494949",fg="#fff")
+        # saveButton.config(font=("Arial",38))
+        # saveButton.place(relwidth=0.25,relheight=0.175,relx=0.025,rely=0.675)
 
         self.root.protocol("WM_DELETE_WINDOW",self.exit)
         self.root.mainloop()
@@ -155,12 +155,25 @@ class Athletes(tk.Frame):
         self.changes.clear()
         self.window.deiconify()
         self.root.destroy()
-
+    def disableAll(self):
+        self.forms['state']=tk.DISABLED
+        self.type['state']=tk.DISABLED
+        self.ProjectButton['state']=tk.DISABLED
+        self.createButton['state']=tk.DISABLED
+        self.deleteButton['state']=tk.DISABLED
+        self.teamButton['state']=tk.DISABLED
+    def enableAll(self):
+        self.forms['state']=tk.NORMAL
+        self.type['state']=tk.NORMAL
+        self.ProjectButton['state']=tk.NORMAL
+        self.createButton['state']=tk.NORMAL
+        self.deleteButton['state']=tk.NORMAL
+        self.teamButton['state']=tk.NORMAL
     def initClub(self):
-        if self.changes.peekType()=="Club":
-            self.changes.moveBack(self.root,"Athletes")
-        elif self.changes.peekType(1)=="Club":
-            self.changes.moveForward(self.root,"Athletes")
+        if self.changes.checkExisting("Club")==1:
+            self.changes.openExisting(self.root,"Athletes","Club",1)
+        elif self.changes.checkExisting("Club")==-1:
+            self.changes.openExisting(self.root,"Athletes","Club",-1)
         else:
             self.changes.addBack(self.root,"Athletes")
             init=pg.Club(self.root,self.changes)
@@ -184,6 +197,9 @@ class Athletes(tk.Frame):
             self.typeVar.set("Στοιχεία")
             self.update(0)
         else:
+            for i in self.listFrame.winfo_children():
+                i.destroy()
+                self.listFrame.items=[]
             self.type["state"]=tk.DISABLED
 
     def update(self,value):#Update list
@@ -198,22 +214,22 @@ class Athletes(tk.Frame):
     def createEntry(self):#Create New entry
         if self.w_c["Create"]=="":
             self.top=tk.Toplevel(self.root,bg="#1b2135")
-            self.top.geometry("400x400")
+            self.top.geometry("500x200")
             self.top.resizable(True,True)
             self.w_c["Create"]=self.top
             self.top.title("Είδος Νέου Μέλους")
             frame=tk.Frame(self.top,bg="#1b2135")
-            frame.grid(row=0,column=0,rowspan=8,columnspan=8)
+            frame.pack(fill=tk.BOTH,expand=True)
             label=tk.Label(frame,text="Επιλεξτε το είδος του νέου μέλους")
             label.config(font=("Arial",18))
-            label.grid(column=2,columnspan=4)
+            label.pack(anchor=tk.CENTER)
             options=["Αθλητής/τρια","Προπονητικο Team","Χορηγος","Θεατης","Παλαιος Αθλητης","Παθητικο Μελος","Γονέας"]
             self.tempvar=tk.StringVar(frame)
             self.tempvar.set("Ιδιότητα")
             self.choicebox=tk.OptionMenu(frame,self.tempvar,"Ιδιότητα",*options,command=self.create)
             self.choicebox.config(font=("Arial",18))
             self.choicebox["menu"].config(font=("Arial",18))
-            self.choicebox.grid(row=1,column=2,columnspan=4)
+            self.choicebox.pack(anchor=tk.CENTER)
             self.listFrame.disableAll()
             self.top.protocol("WM_DELETE_WINDOW",lambda :self.endAction("Create"))
             self.top.mainloop()
@@ -230,28 +246,35 @@ class Athletes(tk.Frame):
     def deleteEntry(self):
         if self.w_c["Delete"]=="":
             self.top=self.top=tk.Toplevel(self.root,bg="#1b2135")
-            self.top.geometry("800x500")
+            self.top.geometry("950x800")
             self.top.resizable(True,True)
             self.top.title("Διαγραφή Στοιχείου")
             self.w_c["Delete"]=self.top
             self.topFrame=tk.Frame(self.top,bg="#1b2135")
-            self.topFrame.pack()
-
+            self.topFrame.pack(fill=tk.BOTH,expand=True)
+            self.titleFrame=tk.Frame(self.topFrame,bg="#1b2135")
+            self.titleFrame.pack(fill=tk.X)
+            tk.Label(self.titleFrame,text="Διαγραφή Μέλους",bg="#1b2135",fg="#fff",font=("Arial",24)).pack(anchor=tk.W,side=tk.LEFT)
             self.deleteVariable=tk.StringVar()
             self.deleteVariable.set("Αναζήτηση")
-            self.deleteSearch=tk.Entry(self.topFrame,textvariable=self.deleteVariable,bg="grey")
+            self.deleteSearch=tk.Entry(self.titleFrame,textvariable=self.deleteVariable,bg="grey")
             self.deleteSearch.bind("<FocusIn>",func=self.clearDeleteInput)
             self.deleteSearch.bind("<Return>",func=self.refreshTreeview)
-            self.deleteSearch.pack(padx=25,pady=15)
+            self.deleteSearch.pack(padx=25,pady=25,side=tk.RIGHT)
             self.deleteSearch.config(font=("Arial",16))
+            deleteButton=tk.Button(self.titleFrame,text="Διαγραφή Επιλεγμένων",command=self.deleteSelected)
+            deleteButton.pack(pady=25,padx=10,side=tk.RIGHT)
+            deleteButton.config(font=("Arial",16))
 
             self.treeframe=tk.Frame(self.topFrame)
-            self.treeframe.pack(padx=10,pady=25)
-
+            self.treeframe.pack(padx=10,pady=25,fill=tk.BOTH,expand=True)
+            style=ttk.Style()
+            style.configure("mystyle.Treeview",rowheight=25,font=("Arial",16))
+            style.configure("mystyle.Treeview.Heading",rowheight=30,font=("Arial",18))
             tree_scroll=ttk.Scrollbar(self.treeframe)
             tree_scroll.pack(side=tk.RIGHT,fill=tk.Y)
 
-            self.treeview=ttk.Treeview(self.treeframe,select=tk.EXTENDED,columns=["Όνομα","Επώνυμο","Κατηγορία"],yscrollcommand=tree_scroll.set)
+            self.treeview=ttk.Treeview(self.treeframe,style="mystyle.Treeview",select=tk.EXTENDED,columns=["Όνομα","Επώνυμο","Κατηγορία"],yscrollcommand=tree_scroll.set)
             self.treeview.column("#0",width=0,stretch=tk.NO)
             self.treeview.column("Επώνυμο",anchor=tk.CENTER,width=120,minwidth=50)
             self.treeview.column("Όνομα",anchor=tk.W,width=120,minwidth=50)
@@ -260,13 +283,12 @@ class Athletes(tk.Frame):
             self.treeview.heading("Επώνυμο",text="Επώνυμο",anchor=tk.W)
             self.treeview.heading("Όνομα",text="Όνομα",anchor=tk.W)
             self.treeview.heading("Κατηγορία",text="Κατηγορία",anchor=tk.W)
-            self.treeview.pack(expand=True,fill=tk.BOTH)
+            self.treeview.pack(anchor=tk.CENTER,expand=True,fill=tk.BOTH)
             self.refreshTreeview(0)
 
             tree_scroll.config(command=self.treeview.yview)
-            deleteButton=tk.Button(self.topFrame,text="Διαγραφή Επιλεγμένων",command=self.deleteSelected)
-            deleteButton.pack(anchor=tk.CENTER,pady=15,padx=10)
-            deleteButton.config(font=("Arial",16))
+
+
             self.top.protocol("WM_DELETE_WINDOW",lambda :self.endAction("Delete"))
             self.top.mainloop()
         else:
@@ -279,7 +301,7 @@ class Athletes(tk.Frame):
     def create(self,event):
         if self.tempvar.get()!="Ιδιότητα":
             self.top.destroy()
-            newWindow=ItemCreation(self,self.root,self.tempvar.get(),self.data,bg="#1b2135")
+            newWindow=ItemCreated(self,self.root,self.tempvar.get(),self.data,bg="#1b2135")
 
 
 
@@ -289,9 +311,10 @@ class Athletes(tk.Frame):
         for item in temp:
             self.data=self.data.drop(self.treeview.item(item,option="values")[:2])
             write_data(self.data)
+            self.refreshTreeview(0)
             if mb.askyesno("Τέρματισμός Διαγραφής", "Είστε σίγουρος/η για την επιλογή σας;\nΗ σελίδα θα ανανεωθεί"):
                 self.redraw()
-            self.refreshTreeview(0)
+            
 
     def redraw(self):
         tempWindow=self.getWindow()
@@ -320,7 +343,7 @@ class Athletes(tk.Frame):
 
     def projectData(self):
         if self.w_c["Project"]=="":
-            self.w_c["Project"]=ProjectList(self,self.data)
+            init=ProjectList(self,self.data)
         else:
             try:
                 self.w_c["Project"].deiconify()
@@ -348,10 +371,12 @@ class ItemList(tk.Frame):
     def setScrollBar(self,obj):
         self.scrollbar=obj
     def disableAll(self):
+        self.root.disableAll()
         if len(self.items)!=0:
             for item in self.items:
                 item["state"]=tk.DISABLED
     def enableAll(self):
+        self.root.enableAll()
         if len(self.items)!=0:
             for item in self.items:
                 item["state"]=tk.NORMAL
@@ -389,8 +414,8 @@ class ItemButton(tk.Button):
         #The more information window
         self.root.disableAll()
         self.top=tk.Toplevel(bg="#1b2135")
-        self.root.geometry("800x500")
-        self.root.resizable(True,True)
+        self.top.geometry("800x750")
+        self.top.resizable(True,True)
         self.top.title(self.textName)
         self.topFrame=tk.Frame(self.top,bg="#1b2135")
         self.topFrame.place(relheight=1,relwidth=1,relx=0,rely=0)
@@ -439,17 +464,17 @@ class ItemButton(tk.Button):
         self.frames["Κατηγορία"]=self.catEntry
         self.entries["Κατηγορία"]=catvar
 
-        self.rest=tk.LabelFrame(self.top,bg="#1b2135")
+        self.rest=tk.Frame(self.top,bg="#1b2135")
         self.rest.place(relheight=0.5,relwidth=0.9,relx=0.05,rely=0.275)
         counter=0
         self.frames={}
         for cat in self.person.iloc[0].index:
             if cat!="Κατηγορία" and cat!="Τελευταία επεξεργασία"and cat!="Τελευταία Πληρωμή" and cat!="Ημερομηνία Δημιουργίας"and cat!="Κατάσταση":
-               tempFrame=tk.Frame(self.rest,bg="#1b2135")
+               tempFrame=tk.LabelFrame(self.rest,bg="#1b2135")
                tempFrame.place(relheight=0.1,relwidth=1,relx=0,rely=0+0.075*counter)
                tempVar=tk.StringVar()
                tempVar.set(self.person[cat].iloc[0])
-               tempLabel=tk.Label(tempFrame,text=cat,bg="#1b2135",fg="#fff",justify=tk.LEFT)
+               tempLabel=tk.Label(tempFrame,text="{:20s}".format(cat),bg="#1b2135",fg="#fff",justify=tk.LEFT,anchor='w')
                tempLabel.config(font=("Arial",14))
                tempLabel.place(relwidth=0.5,relheight=1)
                tempEntry=tk.Entry(tempFrame,textvariable=tempVar,bg="#fff")
@@ -482,7 +507,7 @@ class ItemButton(tk.Button):
             write_data(self.data)
             self.data=run()
         except Exception:
-            pritn(pd.to_datetime(self.dateVar.get()))
+            print(pd.to_datetime(self.dateVar.get()))
 
     def endAction(self):
         self.top.destroy()
@@ -566,6 +591,35 @@ class windowManager:
 
     def addForward(self,toplevel,descr):#Adds a window in the forward list as the current forward destination
         self.forward.append((toplevel,descr))
+    def checkExisting(self,name: str)->int:
+        '''Checks if a window type already exists
+        '''
+        for i in self.back:
+            if i[1]==name:
+                return 1
+        for i in self.forward:
+            if i[1]==name:
+                return -1
+        return 0
+
+    def openExisting(self,root:tk.Toplevel,descr:str,name:str,where:int)-> None:
+        '''Moves to an already existing window
+        '''
+        if where>0:
+            for i in self.back:
+                if i[1]==name:
+                    self.back.remove(i)
+                    i[0].deiconify()
+                    root.iconify()
+                    self.addBack(root,descr)
+        elif where<0:
+            for i in self.forward:
+                if i[1]==name:
+                    self.forward.remove(i)
+                    i[0].deiconify()
+                    root.iconify()
+                    self.addBack(root,descr)
+            
 
     def moveBack(self,curr,descr):#Initiates a move to previous window action, while setting the current window as a forward destination with its string description
         if self.checkBack():
@@ -611,8 +665,8 @@ class typedEntry(tk.Entry):
     def getCat(self):
         return self.category;
 
-class ItemCreation(tk.Frame):
-    def __init__(self,root,window,state: str,data,**kwargs):
+class ItemCreated(tk.Frame):
+    def __init__(self,root:Athletes,window,state: str,data,**kwargs):
         self.father=root
         self.window=window
         self.state=state
@@ -622,7 +676,7 @@ class ItemCreation(tk.Frame):
 
 
         self.root=tk.Toplevel(self.window,bg="#1b2135")
-        self.root.geometry("800x600")
+        self.root.geometry("950x900")
         self.root.resizable(True,True)
         self.father.w_c["Create"]=self.root
         self.root.title("Δημιουργία: "+self.state)
@@ -633,14 +687,14 @@ class ItemCreation(tk.Frame):
             self.attributes[i]=""
         self.attributes["Ιδιότητα"]=self.state
         self.attributes["Τελευταία επεξεργασία"]=pd.Timestamp.today()
-        self.data["Τελευταία Πληρωμή"]=pd.Timestamp.today()
-        self.data["Κατάσταση"]=1 if self.state=="Αθλητής/τρια" else 0
+        self.attributes["Τελευταία Πληρωμή"]=pd.Timestamp.today()
+        self.attributes["Κατάσταση"]=1 if self.state=="Αθλητής/τρια" else 0
         self.attributes["Ημερομηνία Δημιουργίας"]=pd.Timestamp.today()
         namevar=tk.StringVar()
         namevar.set("")
         self.nameFrame=tk.Frame(self,bg="#1b2135")
         self.nameFrame.place(relheight=0.1,relwidth=0.4,relx=0.05,rely=0.05)
-        self.nameLabel=tk.Label(self.nameFrame,text="Όνομα:",bg="#1b2135",fg="#fff")
+        self.nameLabel=tk.Label(self.nameFrame,text="{:20s}".format("Όνομα:"),bg="#1b2135",fg="#fff")
         self.nameLabel.config(font=("Arial",18))
         self.nameLabel.pack(anchor=tk.NW,fill=tk.X)
         self.nameEntry=tk.Entry(self.nameFrame,textvariable=namevar,bg="#fff")
@@ -652,7 +706,7 @@ class ItemCreation(tk.Frame):
         surNamevar.set("")
         self.surNameFrame=tk.Frame(self,bg="#1b2135")
         self.surNameFrame.place(relheight=0.1,relwidth=0.4,relx=0.55,rely=0.05)
-        self.surNameLabel=tk.Label(self.surNameFrame,text="Επώνυμο:",bg="#1b2135",fg="#fff")
+        self.surNameLabel=tk.Label(self.surNameFrame,text="{:20s}".format("Επώνυμο:"),bg="#1b2135",fg="#fff")
         self.surNameLabel.config(font=("Arial",18))
         self.surNameLabel.pack(anchor=tk.NW,fill=tk.X)
         self.surNameEntry=tk.Entry(self.surNameFrame,textvariable=surNamevar,bg="#fff")
@@ -664,7 +718,7 @@ class ItemCreation(tk.Frame):
         catvar.set("" if self.state=="Αθλητής/τρια" else self.state)
         self.catFrame=tk.Frame(self,bg="#1b2135")
         self.catFrame.place(relheight=0.1,relwidth=0.4,relx=0.3,rely=0.2)
-        self.catLabel=tk.Label(self.catFrame,text="Κατηγορία:",bg="#1b2135",fg="#fff")
+        self.catLabel=tk.Label(self.catFrame,text="{:20s}".format("Κατηγορία:"),bg="#1b2135",fg="#fff")
         self.catLabel.config(font=("Arial",18))
         self.catLabel.pack(anchor=tk.NW,fill=tk.X)
         self.catEntry=tk.Entry(self.catFrame,textvariable=catvar,bg="#fff")
@@ -672,34 +726,26 @@ class ItemCreation(tk.Frame):
         self.catEntry.pack(anchor=tk.NW,fill=tk.X)
         self.entries["Κατηγορία"]=catvar
 
-        restFrame=tk.LabelFrame(self)
+        restFrame=tk.Frame(self,bg="#1b2135")
         restFrame.place(relheight=0.5,relwidth=0.9,relx=0.05,rely=0.35)
-        restCanvas=tk.Canvas(restFrame)
-        restCanvas.pack(side=tk.LEFT,fill=tk.BOTH,expand=True)
-        restScroll=ttk.Scrollbar(restFrame,command=restCanvas.yview)
-        restScroll.pack(side=tk.RIGHT,fill=tk.Y)
-        restCanvas.configure(yscrollcommand=restScroll.set,bg="#1b2135")
-        restCanvas.bind("<Configure>",lambda e: restCanvas.configure(scrollregion=restCanvas.bbox("all")))
-        mainListFrame=tk.Frame(restFrame,bg="#1b2135")
-        restCanvas.create_window((0,0),window=mainListFrame,anchor=tk.NW) #Be Careful
         counter=0
         for cat in self.check().reset_index().columns:
-            if cat!="Όνομα"and cat!="Επώνυμο" and cat!="Κατηγορία" and cat!="Ιδιότητα" and cat!="Τελευταία Πληρωμή" and cat!="Τελευταία επεξεργασία" and cat!="Ημερομηνία Δημιουργίας":
+            if cat!="Όνομα"and cat!="Επώνυμο" and cat!="Κατηγορία" and cat!="Ιδιότητα" and cat!="Τελευταία Πληρωμή" and cat!="Τελευταία επεξεργασία" and cat!="Ημερομηνία Δημιουργίας" and cat!="Κατάσταση":
 
                 tempVariable=tk.StringVar()
                 tempVariable.set("")
-                tempFrame=tk.Frame(mainListFrame)
-                tempFrame.pack(fill=tk.X,expand=True)
-                tempLabel=tk.Label(tempFrame,text=cat,bg="#1b2135",fg="#fff")
+                tempFrame=tk.LabelFrame(restFrame,bg="#1b2135")
+                tempFrame.place(relheight=0.1,relwidth=1,relx=0,rely=0+0.075*counter)
+                tempLabel=tk.Label(tempFrame,text="{:25s}".format(cat.strip()),bg="#1b2135",fg="#fff",anchor="w")
                 tempLabel.config(font=("Arial",18))
-                tempLabel.pack(side=tk.LEFT,expand=True,fill=tk.X)
+                tempLabel.place(relwidth=0.5,relheight=1)
                 tempEntry=tk.Entry(tempFrame,textvariable=tempVariable,bg="#fff")
                 tempEntry.config(font=("Arial",18))
-                tempEntry.pack(side=tk.RIGHT,expand=True,fill=tk.X)
+                tempEntry.place(relwidth=0.5,relheight=1,relx=0.5)
                 self.entries[cat]=tempVariable
                 counter+=1
 
-        self.doneButton=tk.Button(self,text="Ολοκλήρωσε",command=self.complete)
+        self.doneButton=tk.Button(self,text="Ολοκλήρωση",command=self.complete,font=("Arial",16))
         self.doneButton.place(relheight=0.05,relwidth=0.35,relx=0.55,rely=0.9)
 
 
@@ -707,11 +753,12 @@ class ItemCreation(tk.Frame):
         tempEntry=None
         tempFrame=None
 
-        self.root.protocol("WM_DESTROY_WINDOW",self.endAction)
+        self.root.protocol("WM_DELETE_WINDOW",self.endAction)
         self.root.mainloop()
     def endAction(self):
         self.father.w_c["Create"]=""
         self.root.destroy()
+        self.redraw()
     def redraw(self):
         tempWindow=self.father.getWindow()
         tempChanges=self.father.getChanges()
@@ -723,33 +770,47 @@ class ItemCreation(tk.Frame):
             self.attributes[i]=self.entries[i].get()
         if not (self.attributes["Όνομα"]=="" or  self.attributes["Επώνυμο"]=="" or self.attributes["Κατηγορία"]==""):
             try:
-                if self.attributes["Εκρεμμότητες"]=="":
-                    self.attributes["Εκρεμμότητες"]=0
-                else:
-                    self.data["Κατάσταση"]=2
-                if self.attributes["Μπλούζες Δωρεάν"]=="":
-                        self.attributes["Μπλούζες Δωρεάν"]=0
-                if self.attributes["Μπλούζες Χρεωμένες"]=="":
-                    self.attributes["Μπλούζες Χρεωμένες"]=0
-                if self.attributes["Σύνολο για Μπλούζες"]=="":
-                    self.attributes["Σύνολο για Μπλούζες"]=0
-            except KeyError:
-               print("")
-            temp=pd.Series(self.attributes)
-            temp=temp.where(temp!="")
-            self.data=self.data.reset_index().append(temp,ignore_index=True)
-            self.data=self.data.set_index("Επώνυμο","Όνομα").fillna("-")
-            write_data(self.data)
-            self.data=run()
-            if mb.askyesno("Τέρματισμός Δημιουργίας", "Θα θέλατε να τερματίσετε την δημιουργία;\nΗ σελίδα θα ανανεωθεί"):
-                self.root.destroy()
-                self.redraw()
+                try:
+                    if self.attributes["Εκρεμμότητες"]=="":
+                        self.attributes["Εκρεμμότητες"]=0
+                        self.attributes["Κατάσταση"]=1
+                    else:
+                        self.attributes["Εκρεμμότητες"]=int(self.attributes["Εκρεμμότητες"])
+                        self.attributes["Κατάσταση"]=2
+                    if self.attributes["Μπλούζες Δωρεάν"]=="":
+                            self.attributes["Μπλούζες Δωρεάν"]=0
+                    else:
+                        self.attributes["Μπλούζες Δωρεάν"]=int(self.attributes["Μπλούζες Δωρεάν"])
+                    if self.attributes["Μπλούζες Χρεωμένες"]=="":
+                        self.attributes["Μπλούζες Χρεωμένες"]=0
+                    else:
+                        self.attributes["Μπλούζες Χρεωμένες"]=int(self.attributes["Μπλούζες Χρεωμένες"])
+                    if self.attributes["Σύνολο για Μπλούζες"]=="":
+                        self.attributes["Σύνολο για Μπλούζες"]=0
+                    else:
+                        self.attributes["Σύνολο για Μπλούζες"]=int(self.attributes["Σύνολο για Μπλούζες"])
+                except KeyError:
+                    pass
+                temp=pd.Series(self.attributes)
+                temp=temp.where(temp!="")
+                self.data=self.data.reset_index().append(temp,ignore_index=True)
+                self.data=self.data.set_index("Επώνυμο","Όνομα").fillna("-")
+                write_data(self.data)
+                self.data=run()
+                if mb.askyesno("Τέρματισμός Δημιουργίας", "Θα θέλατε να τερματίσετε την δημιουργία;\nΗ σελίδα θα ανανεωθεί"):
+                    self.father.w_c["Create"]=""
+                    self.root.destroy()
+                    self.redraw()
+            except ValueError:
+                 mb.showerror("Πρόβλημα στην εισαγωγή", "Κάποιο δεδομένο δεν είχε τον σωστό τύπο\n(πχ. κείμενο αντί για αριθμό);\nΠαρακαλώ, προσπαθήστε ξανά")
+
     def check(self):
         if len(self.data)==0:
             return pd.DataFrame()
         return self.data[["Έτος Γέννησης","Σταθερό","Κατηγορία","Ιδιότητα","Κινητό","Email","Επάγγελμα","Χόμπυ","Σχέση με τον Αθλητισμό"]] if self.state!="Αθλητής/τρια" else self.data.drop(columns=["Επάγγελμα","Χόμπυ","Σχέση με τον Αθλητισμό"])
 
 class categoryEntry(tk.Entry):
+    
     def __init__(self,master,cat,textv,root,**kwargs):
         self.root=root
         self.master=master
@@ -768,16 +829,16 @@ class ProjectList(tk.Toplevel):
         self.master=master
         self.data=data
         self.imag={}
-        self.top=super().__init__(master)
-        self.top.geometry("1200x2200")
-        self.top.resizable(True,True)
+        self.top=super().__init__(master,bg="#1b2135")
+        super().geometry("1400x800")
+        super().resizable(True,True)
         self.master.w_c["Project"]=self
-        self.topFrame=tk.Frame(self.top,bg="#1b2135")
-        self.topFrame.pack(expand=True)
-        label=tk.Label(self.topFrame,text="Λίστα Οφειλών Μελών",font=("Arial",24),fg="#fff",bg="#1b2135")
-        label.pack(padx=25,pady=15,anchor=tk.W,expand=True)
+        self.topFrame=tk.Frame(self,bg="#1b2135")
+        self.topFrame.pack(fill=tk.BOTH,expand=True)
         miniframe=tk.Frame(self.topFrame,bg="#1b2135")
-        miniframe.pack(padx=25,pady=15,anchor=tk.E)
+        miniframe.pack(padx=25,pady=15,anchor=tk.E,fill=tk.X)
+        label=tk.Label(miniframe,text="Λίστα Οφειλών Μελών",font=("Arial",24),fg="#fff",bg="#1b2135")
+        label.pack(padx=25,pady=15,side=tk.LEFT,anchor=tk.W)
         self.projectVariable=tk.StringVar()
         self.projectVariable.set("Αναζήτηση")
         self.projectSearch=tk.Entry(miniframe,textvariable=self.projectVariable,bg="grey")
@@ -788,9 +849,9 @@ class ProjectList(tk.Toplevel):
         self.projectSearch.config(font=("Arial",16))
 
         self.emailButton=tk.Button(miniframe,text="Αποστολή Email",font=('Arial', 16),command=lambda : print(self.treeview.item(self.treeview.selection()[0],option="values")[5]))
-        self.emailButton.pack(side="right",expand=True)
+        self.emailButton.pack(side="right")
         self.emailAllButton=tk.Button(miniframe,text="Αποστολή σε όλους",font=('Arial', 16),command=lambda : print(self.treeview.item(self.treeview.selection()[0],option="values")[5]))
-        self.emailAllButton.pack(side="right",expand=True,padx=10)
+        self.emailAllButton.pack(side="right",padx=10)
         self.treeframe=tk.Frame(self.topFrame)
         self.treeframe.pack(padx=10,pady=25)
 
@@ -832,6 +893,8 @@ class ProjectList(tk.Toplevel):
                 self.treeview.delete(item)
         count=0
         searchResults=self.projectVariable.get()
+        if searchResults.strip()=="":
+            self.projectVariable.set("Αναζήτηση")
         if searchResults!="Αναζήτηση":
             for group,frame in self.data.reset_index().groupby(level=0):
                 if frame["Ιδιότητα"].iloc[0]=="Αθλητής/τρια":

@@ -213,10 +213,10 @@ class Club(tk.Frame):
         self.window.deiconify()
         self.root.destroy()
     def initAthlete(self):
-        if self.changes.peekType()=="Athletes":
-            self.changes.moveBack(self.root,"Club")
-        elif self.changes.peekType(1)=="Athletes":
-            self.changes.moveForward(self.root,"Club")
+        if self.changes.checkExisting("Athletes")==1:
+            self.changes.openExisting(self.root,"Club","Athletes",1)
+        elif self.changes.checkExisting("Athletes")==-1:
+            self.changes.openExisting(self.root,"Club","Athletes",-1)
         else:
             self.changes.addBack(self.root,"Club")
             init=of.Athletes(self.root,self.changes)

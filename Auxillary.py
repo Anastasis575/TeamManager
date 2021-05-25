@@ -105,7 +105,7 @@ class viewDetails(tk.Frame):
         labelFrame.pack(padx=25,pady=20,fill=tk.X)
         label=tk.Label(labelFrame,text="Σύνολο:",bg="#1b2135",fg="#fff",font=("Arial",18,"bold"))
         label.pack(anchor=tk.NW)
-        self.final=tk.Label(labelFrame,text=str(int(float(self.hourlyVar.get()))+int(float(self.bonusVar.get()))+int(float(self.dailyVar.get())))+"\t\t",fg="#010101",bg="#fff",font=("Arial",18),anchor="w")
+        self.final=tk.Label(labelFrame,text="{:33}".format(str(float(self.hourlyVar.get())+float(self.bonusVar.get())+float(self.dailyVar.get()))),fg="#010101",bg="#fff",font=("Arial",18),anchor="w")
         self.final.pack(side=tk.LEFT,fill=tk.X)
 
         # Control Buttons
@@ -451,7 +451,7 @@ class createCoach(tk.Frame):
         doneButton=tk.Button(mainFrame,text="Ολοκλήρωση",command=self.complete,bg="#bec1c4",font=('Arial',18))
         doneButton.place(relheight=0.075,relwidth=0.9,relx=0.05,rely=0.9)
 
-        self.root.protocol("WM_WINDOW_DESTROY",self.exit)
+        self.root.protocol("WM_DELETE_WINDOW",self.exit)
         self.root.mainloop()
 
     def exit(self):
@@ -609,8 +609,8 @@ class createMovement(tk.Frame):
         for i in self.entries:
             if i=="Είδος":
                 try:
-                    data["Έσοδο"]=int(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έσοδο" else 0
-                    data["Έξοδο"]=int(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έξοδο" else 0
+                    data["Έσοδο"]=float(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έσοδο" else 0
+                    data["Έξοδο"]=float(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έξοδο" else 0
                 except ValueError:
                     mb.showinfo("Λάθος Είσοδος","Στο πεδίο ποσό πρέπει να αναγραφεί το ποσό του γεγονότος, το οποίο είναι ένας ακέραιος αριθμός.")
             elif i!="Αιτιολογία":
@@ -732,8 +732,8 @@ class EditMovement(tk.Frame):
         for i in self.entries:
             if i=="Είδος":
                 try:
-                    self.notes.loc[self.choice,"Έσοδο"]=int(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έσοδο" else 0
-                    self.notes.loc[self.choice,"Έξοδο"]=int(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έξοδο" else 0
+                    self.notes.loc[self.choice,"Έσοδο"]=float(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έσοδο" else 0
+                    self.notes.loc[self.choice,"Έξοδο"]=float(self.entries["Ποσό"].get()) if self.entries[i].get()=="Έξοδο" else 0
                 except ValueError:
                     mb.showinfo("Λάθος Είσοδος","Στο πεδίο ποσό πρέπει να αναγραφεί το ποσό του γεγονότος, το οποίο είναι ένας ακέραιος αριθμός.")
             elif i!="Αιτιολογία":
