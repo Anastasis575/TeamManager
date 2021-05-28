@@ -483,8 +483,9 @@ class ItemButton(tk.Button):
                tempEntry["state"]=tk.DISABLED
                self.frames[cat]=tempEntry
                self.entries[cat]=tempVar
-               if cat=="Εκκρεμότητες":
+               if cat=="Εκρεμμότητες":
                    self.DueChange=self.person[cat].iloc[0]
+                   print(self.DueChange)
                counter+=1
 
         temp=None
@@ -545,7 +546,7 @@ class ItemButton(tk.Button):
                         self.data=self.data.set_index(["Επώνυμο","Όνομα"])
                     else:
                         self.data.loc[index,i]=data[i] if data[i]!="" else "-"
-                if self.DueChange!=data["Εκρεμμότητες"]:
+                if float(self.DueChange)!=float(data["Εκρεμμότητες"]):
                     self.data.loc[index,"Τελευταία Πληρωμή"]=pd.Timestamp.today()
                     if int(data["Εκρεμμότητες"])<=0:
                         self.data.loc[index,"Κατάσταση"]=1
