@@ -36,6 +36,7 @@ class viewDetails(tk.Frame):
         # If between the last wage and today the month has changed, a new wage is created
         self.createCondition=len(pd.date_range(start=self.lastDate,end=pd.Timestamp.now(),freq="MS"))!=0
         self.root=tk.Toplevel(self.master.root,bg="#1b2135")
+        self.master.disableAll()
         self.master.w_c["EditSalary"]=self.root
         self.root.title("Στοιχεία Μισθοδοσίας")
         self.root.geometry("700x750")
@@ -123,6 +124,7 @@ class viewDetails(tk.Frame):
     def exit(self):
         ''' Method to safely exit the window
         '''
+        self.master.enableAll()
         self.master.w_c["EditSalary"]=""
         self.root.destroy()
 
@@ -230,7 +232,8 @@ class editCoach(tk.Frame):
         self.root.title("Δημιουργία Μισθοδοτούμενου")
         self.root.geometry("1000x900")
         self.root.resizable(True,True)
-        self.master.w_c["Edit"]=self.root
+        self.master.disableAll()
+        self.master.w_c["EditC"]=self.root
         mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
         self.entries={}
@@ -335,7 +338,8 @@ class editCoach(tk.Frame):
         self.root.mainloop()
 
     def exit(self):
-        self.master.w_c["Edit"]=""
+        self.master.w_c["EditC"]=""
+        self.master.enableAll()
         self.root.destroy()
     def complete(self):
         data={}
@@ -372,7 +376,8 @@ class createCoach(tk.Frame):
         self.salaries=salaries
         self.choice=choice
         self.root=tk.Toplevel(self.master.root,bg="#1b2135")
-        self.master.w_c["Create"]=self.root
+        self.master.disableAll()
+        self.master.w_c["CreateC"]=self.root
         self.root.title("Δημιουργία Μισθοδοτούμενου")
         self.root.resizable(True,True)
         self.root.geometry("1000x900")
@@ -455,7 +460,8 @@ class createCoach(tk.Frame):
         self.root.mainloop()
 
     def exit(self):
-        self.master.w_c["Create"]=self.root
+        self.master.w_c["CreateC"]=""
+        self.master.enableAll()
         self.root.destroy()
     def complete(self):
         data={"Ημερομηνία Δημιουργίας":pd.Timestamp.now()}
@@ -490,10 +496,11 @@ class createMovement(tk.Frame):
         self.window=root
         self.notes=notes
         self.root=tk.Toplevel(self.master,bg="#1b2135")
+        self.window.disableAll()
         self.root.resizable(True,True)
         self.root.geometry("800x800")
         self.root.title("Δήλωση Οικονομικού Γεγονότος")
-        self.window.w_c["Create"]=self.root
+        self.window.w_c["CreateM"]=self.root
         mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
 
@@ -572,7 +579,8 @@ class createMovement(tk.Frame):
         self.root.protocol("WM_DELETE_WINDOW",func=self.exit)
         self.root.mainloop()
     def exit(self):
-        self.window.w_c["Create"]=""
+        self.window.w_c["CreateM"]=""
+        self.window.enableAll()
         self.root.destroy()
     def modifyChoices(self,Income):
         if Income:
@@ -633,9 +641,10 @@ class EditMovement(tk.Frame):
         self.choice=indi
         self.notes=notes
         self.root=tk.Toplevel(self.master.root,bg="#1b2135")
+        self.master.disableAll()
         self.root.geometry("800x800")
         self.root.resizable(True,True)
-        self.master.w_c["Edit"]=self.root
+        self.master.w_c["EditM"]=self.root
         mainFrame=tk.Frame(self.root,bg="#1b2135")
         mainFrame.place(relheight=1,relwidth=1)
         self.widgets={}
@@ -781,6 +790,7 @@ class EditMovement(tk.Frame):
         for i in self.widgets:
             self.widgets[i]["state"]=tk.NORMAL
     def exit(self):
-        self.master.w_c["Edit"]=""
+        self.master.w_c["EditM"]=""
+        self.master.enableAll()
         self.root.destroy()
 

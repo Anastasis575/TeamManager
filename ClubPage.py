@@ -71,8 +71,10 @@ class Club(tk.Frame):
         self.notes=readCalendar()
         self.coaches=readCoaches()
         self.salaries=readSalaries()
-        self.w_c={"Create":"",
-                  "Edit":"",
+        self.w_c={"CreateM":"",
+                  "CreateC":"",
+                  "EditM":"",
+                  "EditC":"",
                   "EditSalary":""}
         window.iconify()
 
@@ -207,7 +209,19 @@ class Club(tk.Frame):
 
     def goForward(self):#Forward command
         self.changes.moveForward(self.root,"Club")
-
+    def disableAll(self):
+        self.Delete["state"]=tk.DISABLED
+        self.Salary["state"]=tk.DISABLED
+        self.Create["state"]=tk.DISABLED
+        self.Edit["state"]=tk.DISABLED
+        self.view["state"]=tk.DISABLED
+    def enableAll(self):
+        if self.Variable.get()!="Ταμείο Συλλόγου":
+            self.Delete["state"]=tk.NORMAL
+            self.Salary["state"]=tk.DISABLED if self.Variable.get()!="Μισθοδοσίες" else tk.NORMAL
+            self.Create["state"]=tk.NORMAL
+            self.Edit["state"]=tk.NORMAL
+        self.view["state"]=tk.NORMAL
     def exit(self):
         self.changes.clear()
         self.window.deiconify()
@@ -493,17 +507,24 @@ class Club(tk.Frame):
     #             return frame
 
     def createEntry(self):
-        if self.w_c["Create"]=="":
-            if self.Variable.get()=="Οικονομικές Κινήσεις":
+        if self.Variable.get()=="Οικονομικές Κινήσεις":
+            if self.w_c["CreateM"]=="":
                 aux.createMovement(self,self.root,self.notes)
-            elif self.Variable.get()=="Μισθοδοσίες":
-               aux.createCoach(self,self.coach,self.salaries)
-        else:
-            try:
-                self.w_c["Create"].deiconify()
-            except Exception:
-                self.w_c["Create"].iconify()
-                self.w_c["Create"].deiconify()
+            else:
+                try:
+                    self.w_c["CreateM"].deiconify()
+                except Exception:
+                    self.w_c["CreateM"].iconify()
+                    self.w_c["CreateM"].deiconify()
+        elif self.Variable.get()=="Μισθοδοσίες":
+            if self.w_c["CreateC"]=="":
+                aux.createCoach(self,self.coach,self.salaries)
+            else:
+                try:
+                    self.w_c["CreateC"].deiconify()
+                except Exception:
+                    self.w_c["CreateC"].iconify()
+                    self.w_c["CreateC"].deiconify()
 
     def viewSalary(self):
         """A window to present the salary info including old entries.
@@ -552,26 +573,33 @@ class Club(tk.Frame):
                 self.redraw()
 
     def editEntry(self):
-        if self.w_c["Edit"]=="":
-            if self.Variable.get()=="Οικονομικές Κινήσεις":
+        if self.Variable.get()=="Οικονομικές Κινήσεις":
+            if self.w_c["EditM"]=="":
                 temp=self.movements.selection()
                 if len(temp)!=0:
                     for item in temp:
                         choices=self.movements.item(item,option="values")[:3]
                         individual=self.notes[(self.notes["Ημερομηνία"].astype("str").str.match(choices[0])) &(self.notes["Όνομα"].str.match(choices[1]))&(self.notes["Τύπος"].str.match(choices[2]))].index[0]
                     init=aux.EditMovement(self,individual,self.notes)
-            elif self.Variable.get()=="Μισθοδοσίες":
-               temp=self.salary.selection()
-               if len(temp)!=0:
-                   for item in temp:
-                       individual=self.salary.item(item,option="values")[1:3]
-                   init=aux.editCoach(self,self.coach,(individual[1],individual[0]))
-        else:
-            try:
-                self.w_c["Edit"].deiconify()
-            except:
-                self.w_c["Edit"].iconify()
-                self.w_c["Edit"].deiconify()
+            else:
+                try:
+                    self.w_c["EditM"].deiconify()
+                except:
+                    self.w_c["EditM"].iconify()
+                    self.w_c["EditM"].deiconify()                        
+        elif self.Variable.get()=="Μισθοδοσίες":
+            if self.w_c["EditC"]=="":    
+                temp=self.salary.selection()
+                if len(temp)!=0:
+                    for item in temp:
+                        individual=self.salary.item(item,option="values")[1:3]
+                    init=aux.editCoach(self,self.coach,(individual[1],individual[0]))
+            else:
+                try:
+                    self.w_c["EditC"].deiconify()
+                except:
+                    self.w_c["EditC"].iconify()
+                    self.w_c["EditC"].deiconify()
 
     def set_date(self,value,begin):
         """Set date in the oprtion box and apply the changes to the Treeview

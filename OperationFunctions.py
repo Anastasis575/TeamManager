@@ -164,7 +164,8 @@ class Athletes(tk.Frame):
         self.teamButton['state']=tk.DISABLED
     def enableAll(self):
         self.forms['state']=tk.NORMAL
-        self.type['state']=tk.NORMAL
+        if self.formVar.get()!="Επιλέξτε μια κατηγορία μέλους":
+            self.type["state"]=tk.NORMAL
         self.ProjectButton['state']=tk.NORMAL
         self.createButton['state']=tk.NORMAL
         self.deleteButton['state']=tk.NORMAL
@@ -223,7 +224,7 @@ class Athletes(tk.Frame):
             label=tk.Label(frame,text="Επιλεξτε το είδος του νέου μέλους")
             label.config(font=("Arial",18))
             label.pack(anchor=tk.CENTER)
-            options=["Αθλητής/τρια","Προπονητικο Team","Χορηγος","Θεατης","Παλαιος Αθλητης","Παθητικο Μελος","Γονέας"]
+            options=["Αθλητής/τρια","Προπονητικό Team","Χορηγός","Θεατής","Παλαιός Αθλητής","Παθητικό Μέλος","Γονέας"]
             self.tempvar=tk.StringVar(frame)
             self.tempvar.set("Ιδιότητα")
             self.choicebox=tk.OptionMenu(frame,self.tempvar,"Ιδιότητα",*options,command=self.create)
@@ -245,6 +246,7 @@ class Athletes(tk.Frame):
 
     def deleteEntry(self):
         if self.w_c["Delete"]=="":
+            self.listFrame.disableAll()
             self.top=self.top=tk.Toplevel(self.root,bg="#1b2135")
             self.top.geometry("950x800")
             self.top.resizable(True,True)
