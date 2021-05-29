@@ -425,7 +425,7 @@ class Club(tk.Frame):
         contentCanvas.bind("<Configure>",lambda e: contentCanvas.configure(scrollregion=contentCanvas.bbox("all")))
         actualFrame=tk.Frame(self.contentFrame,bg="#474a48")
         contentCanvas.create_window((0,0),window=actualFrame,anchor=tk.NW,)
-        label=tk.Label(actualFrame,text="Αναλυση Ταμείου Συλλόγου",bg="#474a48",fg="#fff",font=("Arial Black",22),justify=tk.CENTER)
+        label=tk.Label(actualFrame,text="Ανάλυση Ταμείου Συλλόγου",bg="#474a48",fg="#fff",font=("Arial Black",22),justify=tk.CENTER)
         label.pack()
         revenue={}
         cost={}

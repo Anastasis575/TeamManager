@@ -86,7 +86,7 @@ class Athletes(tk.Frame):
 
         #Create button, to create a new entry
         self.createButton=tk.Button(self.headerFrame,bg="#c1c1c1",text="Δημιουργία Καινούργιας Εγγραφής",command=self.createEntry,borderwidth=0)
-        self.createButton.config(font=("Arial",15))
+        self.createButton.config(font=("Arial",16))
         self.createButton.place(relheight=0.15,relwidth=0.25,relx=0.3,rely=0.5)
 
         #Delete button, to delete an existing entry
@@ -259,7 +259,7 @@ class Athletes(tk.Frame):
             self.deleteVariable.set("Αναζήτηση")
             self.deleteSearch=tk.Entry(self.titleFrame,textvariable=self.deleteVariable,bg="grey")
             self.deleteSearch.bind("<FocusIn>",func=self.clearDeleteInput)
-            self.deleteSearch.bind("<Return>",func=self.refreshTreeview)
+            self.deleteSearch.bind("<Return>",func=self.refreshDeleted)
             self.deleteSearch.pack(padx=25,pady=25,side=tk.RIGHT)
             self.deleteSearch.config(font=("Arial",16))
             deleteButton=tk.Button(self.titleFrame,text="Διαγραφή Επιλεγμένων",command=self.deleteSelected)
@@ -269,12 +269,12 @@ class Athletes(tk.Frame):
             self.treeframe=tk.Frame(self.topFrame)
             self.treeframe.pack(padx=10,pady=25,fill=tk.BOTH,expand=True)
             style=ttk.Style()
-            style.configure("mystyle.Treeview",rowheight=25,font=("Arial",16))
-            style.configure("mystyle.Treeview.Heading",rowheight=30,font=("Arial",18))
+            style.configure("2.Treeview",rowheight=25,font=("Arial",16))
+            style.configure("2.Treeview.Heading",rowheight=30,font=("Arial",18))
             tree_scroll=ttk.Scrollbar(self.treeframe)
             tree_scroll.pack(side=tk.RIGHT,fill=tk.Y)
 
-            self.treeview=ttk.Treeview(self.treeframe,style="mystyle.Treeview",select=tk.EXTENDED,columns=["Όνομα","Επώνυμο","Κατηγορία"],yscrollcommand=tree_scroll.set)
+            self.treeview=ttk.Treeview(self.treeframe,style="2.Treeview",select=tk.EXTENDED,columns=["Όνομα","Επώνυμο","Κατηγορία"],yscrollcommand=tree_scroll.set)
             self.treeview.column("#0",width=0,stretch=tk.NO)
             self.treeview.column("Επώνυμο",anchor=tk.CENTER,width=120,minwidth=50)
             self.treeview.column("Όνομα",anchor=tk.W,width=120,minwidth=50)
@@ -284,7 +284,7 @@ class Athletes(tk.Frame):
             self.treeview.heading("Όνομα",text="Όνομα",anchor=tk.W)
             self.treeview.heading("Κατηγορία",text="Κατηγορία",anchor=tk.W)
             self.treeview.pack(anchor=tk.CENTER,expand=True,fill=tk.BOTH)
-            self.refreshTreeview(0)
+            self.refreshDeleted(0)
 
             tree_scroll.config(command=self.treeview.yview)
 
@@ -311,7 +311,7 @@ class Athletes(tk.Frame):
         for item in temp:
             self.data=self.data.drop(self.treeview.item(item,option="values")[:2])
             write_data(self.data)
-            self.refreshTreeview(0)
+            self.refreshDeleted(0)
             if mb.askyesno("Τέρματισμός Διαγραφής", "Είστε σίγουρος/η για την επιλογή σας;\nΗ σελίδα θα ανανεωθεί"):
                 self.redraw()
             
@@ -325,7 +325,7 @@ class Athletes(tk.Frame):
     def clearDeleteInput(self,value):
         self.deleteVariable.set("")
 
-    def refreshTreeview(self,event):
+    def refreshDeleted(self,event):
         if len(self.treeview.get_children())!=0:
             for item in self.treeview.get_children():
                 self.treeview.delete(item)
@@ -485,7 +485,6 @@ class ItemButton(tk.Button):
                self.entries[cat]=tempVar
                if cat=="Εκρεμμότητες":
                    self.DueChange=self.person[cat].iloc[0]
-                   print(self.DueChange)
                counter+=1
 
         temp=None
@@ -493,9 +492,9 @@ class ItemButton(tk.Button):
         tempEntry=None
         tempVar=None
 
-        self.editButton=tk.Button(self.topFrame,text="Επεξεργασία",command=self.enable)
+        self.editButton=tk.Button(self.topFrame,text="Επεξεργασία",command=self.enable,font=("Arial",16))
         self.editButton.place(relheight=0.05,relwidth=0.35,relx=0.1,rely=0.9)
-        self.doneButton=tk.Button(self.topFrame,text="Ολοκλήρωση",command=self.complete)
+        self.doneButton=tk.Button(self.topFrame,text="Ολοκλήρωση",command=self.complete,font=("Arial",16))
         self.doneButton.place(relheight=0.05,relwidth=0.35,relx=0.55,rely=0.9)
         self.doneButton["state"]=tk.DISABLED
 
@@ -831,7 +830,7 @@ class ProjectList(tk.Toplevel):
         self.data=data
         self.imag={}
         self.top=super().__init__(master,bg="#1b2135")
-        super().geometry("1400x800")
+        super().geometry("1400x750")
         super().resizable(True,True)
         self.master.w_c["Project"]=self
         self.topFrame=tk.Frame(self,bg="#1b2135")
@@ -861,9 +860,9 @@ class ProjectList(tk.Toplevel):
 
         style=ttk.Style()
         style.configure('Treeview', rowheight=60)
-        style.configure("mystyle.Treeview",font=('Arial', 12)) # Modify the font of the body
-        style.configure("mystyle.Treeview.Heading", font=('Arial', 14,'bold'),rowheight=120) # Modify the font of the headings
-        self.treeview=ttk.Treeview(self.treeframe,style="mystyle.Treeview",select=tk.EXTENDED,columns=["Όνομα","Επώνυμο","Κατηγορία",'Σταθερό',"Κινητό","Email","Εκκρεμμότητες","Ημέρες από Εξόφληση"],yscrollcommand=tree_scroll.set)
+        style.configure("ownstyle.Treeview",font=('Arial', 12)) # Modify the font of the body
+        style.configure("ownstyle.Treeview.Heading", font=('Arial', 14,'bold'),rowheight=120) # Modify the font of the headings
+        self.treeview=ttk.Treeview(self.treeframe,style="ownstyle.Treeview",select=tk.EXTENDED,columns=["Όνομα","Επώνυμο","Κατηγορία",'Σταθερό',"Κινητό","Email","Εκκρεμμότητες","Ημέρες από Εξόφληση"],yscrollcommand=tree_scroll.set)
         self.treeview.column("#0",width=120,stretch=tk.NO)
         self.treeview.column("Επώνυμο",anchor=tk.CENTER,width=120,minwidth=50)
         self.treeview.column("Όνομα",anchor=tk.W,width=120,minwidth=50)
