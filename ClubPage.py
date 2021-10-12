@@ -68,6 +68,7 @@ class Club(tk.Frame):
     def __init__(self,window,cha):
         self.window=window
         self.changes=cha
+        self.athletes=None
         self.notes=readCalendar()
         self.coaches=readCoaches()
         self.salaries=readSalaries()
@@ -76,16 +77,10 @@ class Club(tk.Frame):
                   "EditM":"",
                   "EditC":"",
                   "EditSalary":""}
-        window.iconify()
 
         #Initialisation and main instance variables initialization
-        self.root=tk.Toplevel(window)
-        self.root.resizable(True,True)
-        rootCanvas=tk.Canvas(self.root,height=1200,width=1400)
-        rootCanvas.pack()
-        super().__init__(self.root,bg="#4e73c2")
+        super().__init__(window,bg="#4e73c2")
         super().place(relheight=1,relwidth=1)
-        self.root.state("zoomed")
 
         #Two basic operational frames
         self.headerFrame = tk.Frame(self,bg="light grey")
@@ -152,7 +147,7 @@ class Club(tk.Frame):
         #movements=ttk.Treeview(contentFrame)
 
         #Athlete creation Button
-        AthleteCreation=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΜελών",command=self.initAthlete,bg="#494949",fg="#fff")
+        AthleteCreation=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΜελών",command=lambda:self.getAthletes().lift() if self.athletes!=None else self.wait(),bg="#494949",fg="#fff")
         AthleteCreation.config(font=("Arial",36))
         AthleteCreation.place(relwidth=0.25,relheight=0.2,relx=0.025,rely=0.05)
         #DEPRACATED!!!
@@ -197,9 +192,10 @@ class Club(tk.Frame):
         self.Salary.place(relheight=0.1,relwidth=0.25,relx=0.025,rely=0.675)
         self.Salary["state"]=tk.DISABLED
 
-        self.root.protocol("WM_DELETE_WINDOW",func=self.exit)
-        self.root.mainloop()
-
+    def athletesInit(self,ahtletes):
+        self.athletes=ahtletes
+    def getAthletes(self):
+        return self.athletes
     def redraw(self):
         self.root.destroy()
         init=Club(self.window,self.changes)
@@ -226,15 +222,6 @@ class Club(tk.Frame):
         self.changes.clear()
         self.window.deiconify()
         self.root.destroy()
-    def initAthlete(self):
-        if self.changes.checkExisting("Athletes")==1:
-            self.changes.openExisting(self.root,"Club","Athletes",1)
-        elif self.changes.checkExisting("Athletes")==-1:
-            self.changes.openExisting(self.root,"Club","Athletes",-1)
-        else:
-            self.changes.addBack(self.root,"Club")
-            init=of.Athletes(self.root,self.changes)
-
 
     def chooseView(self,value):
         self.Create["state"]=tk.DISABLED

@@ -41,17 +41,14 @@ def update(data,name,surname,field,value):
     data[field].loc[(surname,name)] = value
 class Athletes(tk.Frame):
     def __init__(self,window,cha):
-        window.iconify()
         #Initialisation and main instance variables initialization
-        self.root=tk.Toplevel(window,bg="#4e73c2")
-        self.root.geometry("1000x900")
-        self.root.resizable(True,True)
-        super().__init__(self.root,bg="#4e73c2")
+        super().__init__(window,bg="#4e73c2")
         super().place(relheight=1,relwidth=1)
         self.changes = cha
+        self.club=None
         self.window=window
+        window.state('zoomed')
         self.data=run()
-        self.root.state("zoomed")
         self.w_c={"Create":"",
                     "Delete":"",
                     "Person":"",
@@ -119,7 +116,7 @@ class Athletes(tk.Frame):
         self.type["state"]=tk.DISABLED
 
         #Club page creation button
-        self.teamButton=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΣυλόγου",command=self.initClub,bg="#494949",fg="#fff")
+        self.teamButton=tk.Button(self.subHeaderFrame,text="Δεδομένα\nΣυλόγου",command=lambda:self.getClub().lift() if self.club!=None else self.wait(),bg="#494949",fg="#fff")
         self.teamButton.config(font=("Arial",36))
         self.teamButton.place(relwidth=0.25,relheight=0.2,relx=0.025,rely=0.05)
 
@@ -142,10 +139,12 @@ class Athletes(tk.Frame):
         # saveButton=tk.Button(self.subHeaderFrame,text="Αποθήκευση",command=self.save,bg="#494949",fg="#fff")
         # saveButton.config(font=("Arial",38))
         # saveButton.place(relwidth=0.25,relheight=0.175,relx=0.025,rely=0.675)
-
-        self.root.protocol("WM_DELETE_WINDOW",self.exit)
-        self.root.mainloop()
-
+    def wait(self):
+        pass
+    def getClub(self):
+        return self.club
+    def clubInit(self,club):
+        self.club=club
     def getWindow(self):
         return self.window
     def getChanges(self):
@@ -170,14 +169,6 @@ class Athletes(tk.Frame):
         self.createButton['state']=tk.NORMAL
         self.deleteButton['state']=tk.NORMAL
         self.teamButton['state']=tk.NORMAL
-    def initClub(self):
-        if self.changes.checkExisting("Club")==1:
-            self.changes.openExisting(self.root,"Athletes","Club",1)
-        elif self.changes.checkExisting("Club")==-1:
-            self.changes.openExisting(self.root,"Athletes","Club",-1)
-        else:
-            self.changes.addBack(self.root,"Athletes")
-            init=pg.Club(self.root,self.changes)
 
     def goBack(self):#Back command
         self.changes.moveBack(self.root,"Athletes")

@@ -10,21 +10,7 @@ import ClubPage as pg
 def main():
     change=of.windowManager()
     def Exit():
-        Main.destroy()
-    def initAthlete():
-        for i in change.getBack()+change.getForward():
-            i[0].destroy()
-        change.clear()
-        change.addBack(Main,"Main")
-        of.write_data(data)
-        AthleteFrame=of.Athletes(Main,change)      
-
-    def initClub():
-        for i in change.getBack()+change.getForward():
-            i[0].destroy()
-        change.clear()
-        change.addBack(Main,"Main")
-        init=pg.Club(Main,change)
+        Main.destroy()  
 
     def goBack():
         change.moveBack(Main,"Main")
@@ -48,6 +34,11 @@ def main():
 
     mainFrame=tk.Frame(Main,bg="#4e73c2")
     mainFrame.place(relheight=1,relwidth=1)
+    athletesFrame=of.Athletes(Main,change)
+    clubFrame=pg.Club(Main,change)
+    athletesFrame.clubInit(clubFrame);
+    clubFrame.athletesInit(athletesFrame);
+    mainFrame.lift()
 
     headerFrame=headerFrame=tk.Frame(mainFrame,bg="light grey")
     headerFrame.place(relheight=0.35,relwidth=0.8,relx=0.1,rely=0)
@@ -73,7 +64,7 @@ def main():
     athleteFrame=tk.Frame(menuFrame,bg="#3a3a3a")
     athleteFrame.place(relwidth=0.8,relx=0.1,relheight=0.2,rely=0.25)
 
-    athleteButton=tk.Button(athleteFrame,text="Δεδομένα\nΜελών",command=initAthlete,bg="#494949",fg="#fff")
+    athleteButton=tk.Button(athleteFrame,text="Δεδομένα\nΜελών",command=athletesFrame.lift,bg="#494949",fg="#fff")
     athleteFrame.update()
     athleteE=38/athleteFrame.winfo_height()
     athleteButton.config(font=("Arial",38))
@@ -82,7 +73,7 @@ def main():
     teamFrame=tk.Frame(menuFrame,bg="#3a3a3a")
     teamFrame.place(relwidth=0.8,relx=0.1,relheight=0.2,rely=0.55)
 
-    teamButton=tk.Button(teamFrame,text="Δεδομένα\nΣυλόγου",command=initClub,bg="#494949",fg="#fff")
+    teamButton=tk.Button(teamFrame,text="Δεδομένα\nΣυλόγου",command=clubFrame.lift,bg="#494949",fg="#fff")
     teamButton.config(font=("Arial",38))
     teamButton.place(relwidth=0.9,relheight=0.9,relx=0.05,rely=0.05)
 
