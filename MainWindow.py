@@ -1,10 +1,11 @@
 import tkinter as tk
-import pandas as pd
-from PIL import ImageTk,Image
-import OperationFunctions as of
 import tkinter.messagebox as mb
-import CopyPaste as c
+
 import ClubPage as pg
+import CopyPaste as c
+import OperationFunctions as of
+import pandas as pd
+from PIL import Image, ImageTk
 
 
 def main():
